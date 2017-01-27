@@ -22,13 +22,14 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl{
 	}
 
 	@Override
-	public void setCoordinates() {
-		
+	public Set<IInfrastructureNodeImpl> getNearNodes() {
+		return null;
 	}
 
 	@Override
-	public Set<IInfrastructureNodeImpl> getNearNodes() {
-		return null;
+	public void setCoordinates(ICoordinates coordinates) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
