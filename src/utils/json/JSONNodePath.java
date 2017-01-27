@@ -19,7 +19,7 @@ public class JSONNodePath extends JSONArray {
 	
 	public static INodePath getNodePathfromJSONArray(JSONArray array) throws JSONException{
 		INodePath path;
-		List<IInfrastructureNode> list = new ArrayList<>();
+		List<IInfrastructureNode> list = new ArrayList<>();   
 		for(int i = 0; i < array.length(); i++){
 			IInfrastructureNode node = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(array.getJSONObject(i));
 			list.add(node);
