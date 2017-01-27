@@ -11,6 +11,15 @@ public class TravelTimeAckMsg implements ITravelTimeAckMsg {
 	private IInfrastructureNode secondNode;
 	private int travelTime;
 
+	public TravelTimeAckMsg(String userId, String msgId, IInfrastructureNode firstNode, 
+			IInfrastructureNode secondNode, int travelTime){
+		this.userId = userId;
+		this.msgId = msgId;
+		this.firstNode = firstNode;
+		this.secondNode = secondNode;
+		this.travelTime = travelTime;
+	}
+	
 	@Override
 	public String getUserID() {
 		return this.userId;

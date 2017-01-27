@@ -3,6 +3,7 @@ package utils.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import model.Coordinates;
 import model.interfaces.ICoordinates;
 
 public class JSONCoordinates extends JSONObject {
@@ -17,8 +18,8 @@ public class JSONCoordinates extends JSONObject {
 		}
 	}
 	
-	public static ICoordinates getCoordinatesFromJSONObject(JSONObject obj){
-		ICoordinates coordinates = null;
+	public static ICoordinates getCoordinatesFromJSONObject(JSONObject obj) throws JSONException{
+		ICoordinates coordinates = new Coordinates(obj.getDouble(LAT), obj.getDouble(LONG));
 		return coordinates;
 	}
 }

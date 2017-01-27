@@ -3,6 +3,8 @@ package utils.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import model.Coordinates;
+import model.InfrastructureNode;
 import model.interfaces.IInfrastructureNode;
 
 public class JSONInfrastructureNode extends JSONObject {
@@ -17,8 +19,14 @@ public class JSONInfrastructureNode extends JSONObject {
 		}
 	}
 	
-	public static IInfrastructureNode getInfrastructureNodeFromJSONObject(JSONObject obj){
-		IInfrastructureNode node = null;
+	public static IInfrastructureNode getInfrastructureNodeFromJSONObject(JSONObject obj) throws JSONException{
+		IInfrastructureNode node = new InfrastructureNode(obj.getString(ID));
+		return node;
+	}
+	
+	public static IInfrastructureNode getInfrastructureNodeWithCoordinatesFromJSONObject(JSONObject obj) throws JSONException{
+		IInfrastructureNode node = new InfrastructureNode(obj.getString(ID));
+		node.setCoordinates(JSONCoordinates.getCoordinatesFromJSONObject((obj.getJSONObject(COORDINATES))));
 		return node;
 	}
 }
