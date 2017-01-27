@@ -9,7 +9,7 @@ import model.interfaces.INodePath;
  * @author BBC
  *
  */
-public interface IPathResponseMsg extends IUserMobilityMsg {
+public interface IResponsePathMsg extends IUserMobilityMsg {
 	
 	/**
 	 * gets the paths from the message

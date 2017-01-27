@@ -10,7 +10,7 @@ import model.interfaces.INodePath;
  * @author BBC
  *
  */
-public interface IAcknowledgePathMsg extends IUserMobilityMsg {
+public interface IPathAckMsg extends IUserMobilityMsg {
 	/**
 	 * gets the path to be acknowledged
 	 * @return path

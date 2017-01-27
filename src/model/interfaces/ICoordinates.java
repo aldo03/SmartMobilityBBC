@@ -1,7 +1,7 @@
 package model.interfaces;
 
 /**
- * Interface that models GPS coordinates
+ * Interface that models GPS coordinates  
  * @author BBC
  *
  */
