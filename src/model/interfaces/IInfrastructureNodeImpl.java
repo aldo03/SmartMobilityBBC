@@ -15,4 +15,10 @@ public interface IInfrastructureNodeImpl extends IInfrastructureNode {
 	 */
 	Set<IInfrastructureNodeImpl> getNearNodes();
 	
+	/**
+	 * method invoked to set a new node in the near nodes
+	 * @param node
+	 */
+	void setNearNodes(IInfrastructureNodeImpl node);
+	
 }
