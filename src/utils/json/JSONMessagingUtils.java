@@ -5,9 +5,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import model.interfaces.INodePath;
-import model.interfaces.msg.IAcknowledgePathMsg;
 import model.interfaces.msg.ICongestionAlarmMsg;
-import model.interfaces.msg.IPathResponseMsg;
+import model.interfaces.msg.IPathAckMsg;
+import model.interfaces.msg.IResponsePathMsg;
 import model.interfaces.msg.IRequestPathMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;
 import model.interfaces.msg.IResponseTravelTimeMsg;
@@ -22,7 +22,7 @@ public class JSONMessagingUtils {
 	private static final String PATH_LIST = "pathlist";
 	private static final String TRAVEL_TIME = "traveltime";
 	private static final String TRAVEL_ID = "travelid";
-	public String getStringfromAcknowledgePathMsg(IAcknowledgePathMsg msg) throws JSONException{
+	public String getStringfromAcknowledgePathMsg(IPathAckMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
@@ -38,7 +38,7 @@ public class JSONMessagingUtils {
 		return obj.toString();
 	}
 	
-	public String getStringfromPathResponseMsg(IPathResponseMsg msg) throws JSONException{
+	public String getStringfromPathResponseMsg(IResponsePathMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
@@ -85,7 +85,7 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public IAcknowledgePathMsg getAcknowledgePathMsgFromString(String s){
+	public IPathAckMsg getAcknowledgePathMsgFromString(String s){
 		
 		return null;
 	}
@@ -94,7 +94,7 @@ public class JSONMessagingUtils {
 		return null;
 	}
 	
-	public IPathResponseMsg getPathResponseMsgFromString(String s){
+	public IResponsePathMsg getPathResponseMsgFromString(String s){
 		return null;
 	}
 	
