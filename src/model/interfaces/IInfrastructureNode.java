@@ -20,5 +20,5 @@ public interface IInfrastructureNode {
 	/**
 	 * sets the coordinates of the node
 	 */
-	void setCoordinates();
+	void setCoordinates(ICoordinates coordinates);
 }
