@@ -7,29 +7,46 @@ import model.interfaces.IInfrastructureNodeImpl;
 
 public class InfrastructureNodeImpl implements IInfrastructureNodeImpl{
 
-	private String nodeID;
-	private ICoordinates coordinates;
-	private Set<IInfrastructureNodeImpl> nearNodes;
-	
-	@Override
-	public String getNodeID() {
-		return null;
-	}
+  private String nodeID;
+  private ICoordinates coordinates;
+  private Set<IInfrastructureNodeImpl> nearNodes;
+  
+  public InfrastructureNodeImpl(String nodeID, Set<IInfrastructureNodeImpl> nearNodes) {
+    super();
+    this.nodeID = nodeID;
+    this.nearNodes = nearNodes;
+  }
 
-	@Override
-	public ICoordinates getCoordinates() {
-		return null;
-	}
+  public InfrastructureNodeImpl(String nodeID, ICoordinates coordinates, Set<IInfrastructureNodeImpl> nearNodes) {
+    super();
+    this.nodeID = nodeID;
+    this.coordinates = coordinates;
+    this.nearNodes = nearNodes;
+  }
 
-	@Override
-	public Set<IInfrastructureNodeImpl> getNearNodes() {
-		return null;
-	}
+  @Override
+  public String getNodeID() {
+    return this.nodeID;
+  }
 
-	@Override
-	public void setCoordinates(ICoordinates coordinates) {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public ICoordinates getCoordinates() {
+    return this.coordinates;
+  }
+
+  @Override
+  public Set<IInfrastructureNodeImpl> getNearNodes() {
+    return this.nearNodes;
+  }
+
+  @Override
+  public void setNearNodes(IInfrastructureNodeImpl node) {
+    this.nearNodes.add(node);
+  }
+
+  @Override
+  public void setCoordinates(ICoordinates coordinates) {
+    this.coordinates = coordinates;
+  }
 
 }
