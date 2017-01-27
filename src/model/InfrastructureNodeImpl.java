@@ -11,6 +11,12 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl{
 	private ICoordinates coordinates;
 	private Set<IInfrastructureNodeImpl> nearNodes;
 	
+	public InfrastructureNodeImpl(String nodeID, Set<IInfrastructureNodeImpl> nearNodes) {
+		super();
+		this.nodeID = nodeID;
+		this.nearNodes = nearNodes;
+	}
+
 	public InfrastructureNodeImpl(String nodeID, ICoordinates coordinates, Set<IInfrastructureNodeImpl> nearNodes) {
 		super();
 		this.nodeID = nodeID;
@@ -29,11 +35,6 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl{
 	}
 
 	@Override
-	public void setCoordinates() {
-		
-	}
-
-	@Override
 	public Set<IInfrastructureNodeImpl> getNearNodes() {
 		return this.nearNodes;
 	}
@@ -41,6 +42,11 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl{
 	@Override
 	public void setNearNodes(IInfrastructureNodeImpl node) {
 		this.nearNodes.add(node);
+	}
+
+	@Override
+	public void setCoordinates(ICoordinates coordinates) {
+		this.coordinates = coordinates;
 	}
 
 }
