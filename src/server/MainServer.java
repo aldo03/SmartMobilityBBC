@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
@@ -21,9 +25,30 @@ public class MainServer extends Thread{
 	private Map<String, Set<IPair<String,Integer>>> graph;
 	private Set<IInfrastructureNodeImpl> nodesSet; 
 	
-	public MainServer(){
+	
+	public MainServer() throws Exception{
 		this.graph = new HashMap<>();
 		this.nodesSet = new HashSet<>();
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        Server jettyServer = new Server(8080);
+
+        jettyServer.setHandler(context);
+
+        ServletHolder jerseyServlet = context.addServlet(org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+
+        jerseyServlet.setInitOrder(0);
+
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.classnames",
+                MainServer.class.getCanonicalName());
+
+        try {
+            jettyServer.start();
+            jettyServer.join();
+        } finally {
+            jettyServer.destroy();
+        }
 	}
 	
 	/**
