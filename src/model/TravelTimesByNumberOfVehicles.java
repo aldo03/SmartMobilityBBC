@@ -6,8 +6,8 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 	
 	@Override
 	public int getTravelTime(String nodeId, int numOfVehicles) {
-		
-		return 0;
+		int time = 0;
+		return time;
 	}
 
 }
