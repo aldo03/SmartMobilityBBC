@@ -16,6 +16,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import model.interfaces.IPair;
+import utils.messaging.MessagingUtils;
 
 public class InfrastructureDevice extends Thread {
 	private String id;
@@ -37,12 +38,7 @@ public class InfrastructureDevice extends Thread {
 			      public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
 			          throws IOException {
 			        String message = new String(body, "UTF-8");
-			        try {
-						JSONObject json = new JSONObject(message);
-						
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+			        switchArrivedMessage(message);
 			      }
 			    };
 			channel.basicConsume(this.id, true, consumer);
@@ -58,5 +54,37 @@ public class InfrastructureDevice extends Thread {
 	    Channel channel = connection.createChannel();
 	    channel.queueDeclare("receiveQueue", false, false, false, null);
 	    return channel;
+	}
+	
+	private void switchArrivedMessage(String message){
+		try {
+			JSONObject json = new JSONObject(message);
+			int num = MessagingUtils.getIntId(json);
+			switch(num){
+				case 1:
+					handlePathAckMsg(json);
+					break;
+				case 3:
+					handleRequestTravelTimeMsg(json);
+					break;
+				case 6:
+					handleTravelTimeAckMsg(json);
+					break;
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void handlePathAckMsg(JSONObject json){
+		
+	}
+	
+	private void handleRequestTravelTimeMsg(JSONObject json){
+		
+	}
+
+	private void handleTravelTimeAckMsg(JSONObject json){
+	
 	}
 }
