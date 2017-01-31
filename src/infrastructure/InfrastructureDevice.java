@@ -16,6 +16,8 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import model.interfaces.IPair;
+import model.interfaces.msg.IPathAckMsg;
+import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 
 public class InfrastructureDevice extends Thread {
@@ -58,17 +60,16 @@ public class InfrastructureDevice extends Thread {
 	
 	private void switchArrivedMessage(String message){
 		try {
-			JSONObject json = new JSONObject(message);
-			int num = MessagingUtils.getIntId(json);
+			int num = MessagingUtils.getIntId(message);
 			switch(num){
 				case 1:
-					handlePathAckMsg(json);
+					handlePathAckMsg(message);
 					break;
 				case 3:
-					handleRequestTravelTimeMsg(json);
+					handleRequestTravelTimeMsg(message);
 					break;
 				case 6:
-					handleTravelTimeAckMsg(json);
+					handleTravelTimeAckMsg(message);
 					break;
 			}
 		} catch (JSONException e) {
@@ -76,15 +77,15 @@ public class InfrastructureDevice extends Thread {
 		}
 	}
 	
-	private void handlePathAckMsg(JSONObject json){
-		
+	private void handlePathAckMsg(String message) throws JSONException{
+		IPathAckMsg msg = JSONMessagingUtils.getPathAckMsgFromString(message);
 	}
 	
-	private void handleRequestTravelTimeMsg(JSONObject json){
+	private void handleRequestTravelTimeMsg(String message){
 		
 	}
 
-	private void handleTravelTimeAckMsg(JSONObject json){
+	private void handleTravelTimeAckMsg(String message){
 	
 	}
 }

@@ -82,8 +82,7 @@ public class UserDevice extends Thread {
 	
 	private void switchArrivedMsg(String msg){
 		try {
-        	JSONObject json = new JSONObject(msg);
-        	int n = MessagingUtils.getIntId(json);
+        	int n = MessagingUtils.getIntId(msg);
         	switch(n){
         	case 0:
         		break;

@@ -13,7 +13,8 @@ public class MessagingUtils {
 	public static final String TRAVEL_TIME_ACK = "traveltimeack";
 	private static final String MSG_ID = "msgid";
 	
-	public static int getIntId(JSONObject obj) throws JSONException{
+	public static int getIntId(String s) throws JSONException{
+		JSONObject obj = new JSONObject(s);
 		String id = obj.getString(MSG_ID);
 		if(id.equals(CONGESTION_ALARM)){
 			return 0;
