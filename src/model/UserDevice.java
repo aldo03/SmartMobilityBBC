@@ -12,6 +12,7 @@ import com.rabbitmq.client.*;
 
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
+import utils.mom.MomUtils;
 
 public class UserDevice extends Thread {
 
@@ -28,44 +29,21 @@ public class UserDevice extends Thread {
 	    System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 	    return channel;
 	}
-	
-	public void sendMsg(String msg, String host) throws Exception{
-		ConnectionFactory factory = new ConnectionFactory();
-	    factory.setHost(host);
-	    Connection connection = factory.newConnection();
-	    
-	    Channel channel = connection.createChannel();
-	    channel.queueDeclare("userQueue", false, false, false, null);
-	    	  
-	    channel.basicPublish("", "userQueue", null, msg.getBytes("UTF-8"));  
-	    System.out.println(" [x] Sent '" + msg + "'");
 
-	    channel.close();
-	    connection.close();
-	}
-	
 	@Override
 	public void run() {
-		try {
-			this.sendMsg("Want ID from server", "serverHost");
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		this.userID = "id1"; //lo getterà dal server
-		this.host = "Host: " + userID; //anche questo
+		this.userID = "id1"; //get from server
+		this.host = "ip"; // get from server
 		try {
 			this.startReceiving();
 		} catch (IOException | TimeoutException e) {
 			e.printStackTrace();
 		}
 		try {
-			this.sendMsg("Want paths from server", "serverHost");
+			MomUtils.sendMsg(this.factory, this.userID, "Want paths from server");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		
-		
+		}				
 	}
 	
 	private void startReceiving() throws IOException, TimeoutException{
