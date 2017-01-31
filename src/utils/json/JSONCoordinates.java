@@ -2,7 +2,6 @@ package utils.json;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import model.Coordinates;
 import model.interfaces.ICoordinates;
 
