@@ -1,5 +1,8 @@
 package utils.messaging;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MessagingUtils {
 	public static final String CONGESTION_ALARM = "congestionalarm";
 	public static final String PATH_ACK = "pathack";
@@ -8,8 +11,10 @@ public class MessagingUtils {
 	public static final String RESPONSE_PATH = "responsepath";
 	public static final String RESPONSE_TRAVEL_TIME = "responsetraveltime";
 	public static final String TRAVEL_TIME_ACK = "traveltimeack";
+	private static final String MSG_ID = "msgid";
 	
-	public static int getIntId(String id){
+	public static int getIntId(JSONObject obj) throws JSONException{
+		String id = obj.getString(MSG_ID);
 		if(id.equals(CONGESTION_ALARM)){
 			return 0;
 		} else if(id.equals(PATH_ACK)){
