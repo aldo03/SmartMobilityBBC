@@ -12,6 +12,8 @@ import com.rabbitmq.client.*;
 
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
+import utils.json.JSONMessagingUtils;
+import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
 public class UserDevice extends Thread {
@@ -58,12 +60,6 @@ public class UserDevice extends Thread {
 		      public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
 		          throws IOException {
 		        String message = new String(body, "UTF-8");
-		        JSONObject json = null;
-		        try {
-					json = new JSONObject(message);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
 		        
 		        System.out.println(" [x] Received A '" + message + "'");
 		      }
@@ -83,6 +79,29 @@ public class UserDevice extends Thread {
 		return new NodePath(new List<InfrastructureNode>());
 	}
 	*/
+	
+	private void switchArrivedMsg(String msg){
+		try {
+        	JSONObject json = new JSONObject(msg);
+        	int n = MessagingUtils.getIntId(json);
+        	switch(n){
+        	case 0:
+        		break;
+        	case 1:
+        		break;
+        	case 4:
+        		break;
+        	case 5:
+        		break;
+        		
+        	}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void handleCongestionAlarmMsg(JSONObject json){
+	}
 	
 	
 	
