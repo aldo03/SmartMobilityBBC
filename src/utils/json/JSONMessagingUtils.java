@@ -35,7 +35,7 @@ public class JSONMessagingUtils {
 	private static final String TRAVEL_ID = "travelid";
 	private static final String BROKER_ADDR = "brokeraddress";
 	
-	public String getStringfromPathAckMsg(IPathAckMsg msg) throws JSONException{
+	public static String getStringfromPathAckMsg(IPathAckMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
@@ -43,7 +43,7 @@ public class JSONMessagingUtils {
 		return obj.toString();
 	}
 	
-	public String getStringfromCongestionAlarmMsg(ICongestionAlarmMsg msg) throws JSONException{
+	public static String getStringfromCongestionAlarmMsg(ICongestionAlarmMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(FIRST_NODE, new JSONInfrastructureNode(msg.getFirstNode()));
@@ -51,7 +51,7 @@ public class JSONMessagingUtils {
 		return obj.toString();
 	}
 	
-	public String getStringfromResponsePathMsg(IResponsePathMsg msg) throws JSONException{
+	public static String getStringfromResponsePathMsg(IResponsePathMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
@@ -64,7 +64,7 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public String getStringfromRequestPathMsg(IRequestPathMsg msg) throws JSONException{
+	public static String getStringfromRequestPathMsg(IRequestPathMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(FIRST_NODE, new JSONInfrastructureNode(msg.getStartingNode()));
@@ -72,7 +72,7 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public String getStringfromRequestTravelTimeMsg(IRequestTravelTimeMsg msg) throws JSONException{
+	public static String getStringfromRequestTravelTimeMsg(IRequestTravelTimeMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
@@ -82,7 +82,7 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public String getStringfromResponseTravelTimeMsg(IResponseTravelTimeMsg msg) throws JSONException{
+	public static String getStringfromResponseTravelTimeMsg(IResponseTravelTimeMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(TRAVEL_ID, msg.getTravelID());
@@ -90,7 +90,7 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public String getStringfromTravelTimeAckMsg(ITravelTimeAckMsg msg) throws JSONException{
+	public static String getStringfromTravelTimeAckMsg(ITravelTimeAckMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(FIRST_NODE, new JSONInfrastructureNode(msg.getFirstNode()));
@@ -99,21 +99,21 @@ public class JSONMessagingUtils {
 		return obj.toString();	
 	}
 	
-	public IPathAckMsg getPathAckMsgFromString(String s) throws JSONException{
+	public static IPathAckMsg getPathAckMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathfromJSONArray(obj.getJSONArray(PATH));
 		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path);
 		return msg;
 	}
 	
-	public IPathAckMsg getPathAckWithCoordinatesMsgFromString(String s) throws JSONException{
+	public static IPathAckMsg getPathAckWithCoordinatesMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathWithCoordinatesfromJSONArray(obj.getJSONArray(PATH));
 		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path);
 		return msg;
 	}
 	
-	public ICongestionAlarmMsg getCongestionAlarmMsgFromString(String s) throws JSONException{
+	public static ICongestionAlarmMsg getCongestionAlarmMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(FIRST_NODE));
 		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(SECOND_NODE));
@@ -121,7 +121,7 @@ public class JSONMessagingUtils {
 		return msg;
 	}
 	
-	public IResponsePathMsg getResponsePathMsgFromString(String s) throws JSONException{
+	public static IResponsePathMsg getResponsePathMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		List<INodePath> list= new ArrayList<>();
 		JSONArray array = obj.getJSONArray(PATH_LIST);
@@ -133,7 +133,7 @@ public class JSONMessagingUtils {
 		return msg;
 	}
 	
-	public IRequestPathMsg getRequestPathMsgFromString(String s) throws JSONException{
+	public static IRequestPathMsg getRequestPathMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(FIRST_NODE));
 		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(SECOND_NODE));
@@ -141,7 +141,7 @@ public class JSONMessagingUtils {
 		return msg;
 	}
 	
-	public IRequestTravelTimeMsg getRequestTravelTimeMsgFromString(String s) throws JSONException{
+	public static IRequestTravelTimeMsg getRequestTravelTimeMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathfromJSONArray(obj.getJSONArray(PATH));
 		IRequestTravelTimeMsg msg =new RequestTravelTimeMsg(obj.getString(USER_ID), obj.getString(MSG_ID),
@@ -149,13 +149,13 @@ public class JSONMessagingUtils {
 		return msg;
 	}
 	
-	public IResponseTravelTimeMsg getResponseTravelTimeMsgFromString(String s) throws JSONException{
+	public static IResponseTravelTimeMsg getResponseTravelTimeMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		IResponseTravelTimeMsg msg = new ResponseTravelTimeMsg(obj.getString(MSG_ID),obj.getInt(TRAVEL_TIME), obj.getInt(TRAVEL_ID));
 		return msg;
 	}
 	
-	public ITravelTimeAckMsg getTravelTimeAckMsgFromString(String s) throws JSONException{
+	public static ITravelTimeAckMsg getTravelTimeAckMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(FIRST_NODE));
 		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(SECOND_NODE));
