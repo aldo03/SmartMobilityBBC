@@ -18,6 +18,7 @@ dependencies {
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.7'
     compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.3.0.M1'
     compile fileTree(dir: '/lib', include: 'java-json.jar')
+    compile fileTree(dir: '/lib', include: 'amqp-client-3.6.5.jar')
 
 
     // The production code uses the SLF4J logging API at compile time
