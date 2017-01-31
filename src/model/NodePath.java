@@ -18,4 +18,9 @@ public class NodePath implements INodePath {
 		return this.pathNodes;
 	}
 
+	@Override
+	public void removeFirstNode() {
+		this.pathNodes.remove(0);
+	}
+
 }

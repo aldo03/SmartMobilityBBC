@@ -13,4 +13,9 @@ public interface INodePath {
 	 * @return nodes of the path
 	 */
 	List<IInfrastructureNode> getPathNodes();
+	
+	/**
+	 * removes the head of the list
+	 */
+	void removeFirstNode();
 }
