@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+<<<<<<< HEAD
 	<classpathentry path="bin" kind="output"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry sourcepath="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.glassfish.jersey.core/jersey-server/2.7/ee897796be6ca1cdc2be45dd1dfd2a59d6903ad2/jersey-server-2.7-sources.jar" kind="lib" path="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.glassfish.jersey.core/jersey-server/2.7/443dfe312adcbc4b88a87841021f358cf8d12676/jersey-server-2.7.jar"/>
@@ -38,4 +39,10 @@
 	<classpathentry sourcepath="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/9.1.1.v20140108/ee563c1e6ad6ef91fd0a397253057e7f49d02a19/jetty-util-9.1.1.v20140108-sources.jar" kind="lib" path="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/9.1.1.v20140108/7618e783e17c6227d4d76192d1c05e04398bd60c/jetty-util-9.1.1.v20140108.jar"/>
 	<classpathentry sourcepath="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.eclipse.persistence/org.eclipse.persistence.asm/2.5.0/86cf1850551905a189f6ea799fa88ff307b7b847/org.eclipse.persistence.asm-2.5.0-sources.jar" kind="lib" path="C:/Users/Filo/.gradle/caches/modules-2/files-2.1/org.eclipse.persistence/org.eclipse.persistence.asm/2.5.0/de6b65fef5c3beca35586456cb9ed7d090a7536d/org.eclipse.persistence.asm-2.5.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Filo/git/SmartMobilityBBC/lib/java-json.jar"/>
+=======
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="lib/java-json.jar"/>
+	<classpathentry kind="lib" path="lib/amqp-client-3.6.5.jar"/>
+	<classpathentry kind="output" path="bin"/>
+>>>>>>> branch 'master' of https://github.com/aldo03/SmartMobilityBBC.git
 </classpath>
