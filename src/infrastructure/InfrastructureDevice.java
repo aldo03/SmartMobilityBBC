@@ -15,13 +15,20 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import model.ExpectedNumberOfVehicles;
+import model.PendingUsers;
+import model.TravelTimesByNumberOfVehicles;
+import model.interfaces.IExpectedNumberOfVehicles;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
+import model.interfaces.IPendingUsers;
+import model.interfaces.ITravelTimesByNumberOfVehicles;
 import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;
 import model.interfaces.msg.IResponseTravelTimeMsg;
 import model.interfaces.msg.ITravelTimeAckMsg;
+import model.msg.PathAckMsg;
 import model.msg.RequestTravelTimeMsg;
 import model.msg.ResponseTravelTimeMsg;
 import utils.json.JSONMessagingUtils;
@@ -32,12 +39,27 @@ public class InfrastructureDevice extends Thread {
 	private String id;
 	private Set<IPair<String, Integer>> nearNodesWeighted;
 	private String brokerHost;
-	ConnectionFactory factory;
+	private ConnectionFactory factory;
+	private ITravelTimesByNumberOfVehicles travelTimes;
+	private IExpectedNumberOfVehicles expectedVehicles;
+	private IPendingUsers pendingUsers;
 
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
+		this.initializeDataStructures();
 	}
+	
+	private void initializeDataStructures(){
+		this.travelTimes = new TravelTimesByNumberOfVehicles();
+		this.expectedVehicles = new ExpectedNumberOfVehicles();
+		this.pendingUsers = new PendingUsers();
+		for(IPair<String, Integer> p : this.nearNodesWeighted){
+			this.travelTimes.initTravelTimes(p.getFirst(), p.getSecond());
+			this.expectedVehicles.initVehicles(p.getFirst());
+		}
+	}
+	
 
 	@Override
 	public void run() {
@@ -90,9 +112,19 @@ public class InfrastructureDevice extends Thread {
 		}
 	}
 
-	private void handlePathAckMsg(String message) throws JSONException {
+	private void handlePathAckMsg(String message) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
 		IPathAckMsg msg = JSONMessagingUtils.getPathAckMsgFromString(message);
 		//At this point, sets the user among the ones that are going to move across a certain path
+		INodePath path = msg.getPath();
+		path.removeFirstNode();					 //The path is forwarded without the current node
+		if (path.getPathNodes().size() > 0) { 
+			IInfrastructureNode nextNode = path.getPathNodes().get(0);
+			int travelTime = this.pendingUsers.getTravelTimeAndRemoveUser(msg.getUserID(), msg.getTravelID());
+			this.expectedVehicles.addVehicle(nextNode.getNodeID(), travelTime);
+			IPathAckMsg msgToSend = new PathAckMsg(msg.getUserID(), MessagingUtils.PATH_ACK, path, msg.getTravelID());
+			String strToSend = JSONMessagingUtils.getStringfromPathAckMsg(msgToSend);
+			MomUtils.sendMsg(factory, nextNode.getNodeID(), strToSend);
+		}
 	}
 
 	private void handleRequestTravelTimeMsg(String message)
@@ -102,8 +134,11 @@ public class InfrastructureDevice extends Thread {
 		path.removeFirstNode();					 //The path is forwarded without the current node
 		if (path.getPathNodes().size() > 0) {    //This is not the last node of the path
 			IInfrastructureNode nextNode = path.getPathNodes().get(0);
+			int totalTime = msg.getCurrentTravelTime() + getTravelTime(nextNode, msg.getCurrentTravelTime());
+			//the user is added to the pending users
+			this.pendingUsers.addPendingUser(msg.getUserID(), msg.getTravelID(), totalTime);
 			IRequestTravelTimeMsg msgToSend = new RequestTravelTimeMsg(msg.getUserID(),
-					MessagingUtils.REQUEST_TRAVEL_TIME, msg.getCurrentTravelTime() + getTravelTime(nextNode), path,
+					MessagingUtils.REQUEST_TRAVEL_TIME, totalTime, path,
 					msg.getTravelID());
 			String strToSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(msgToSend);
 			MomUtils.sendMsg(factory, nextNode.getNodeID(), strToSend);
@@ -118,7 +153,10 @@ public class InfrastructureDevice extends Thread {
 		ITravelTimeAckMsg msg = JSONMessagingUtils.getTravelTimeAckMsgFromString(message);
 	}
 
-	private int getTravelTime(IInfrastructureNode node) {
-		return 0; // return current travel time between this and node
+	//returns the travel time expected to a certain node at a certain time
+	private int getTravelTime(IInfrastructureNode node, int time) {
+		int numOfVehiclesExpected = this.expectedVehicles.getVehicles(node.getNodeID(), time);
+		int travelTime = this.travelTimes.getTravelTime(node.getNodeID(), numOfVehiclesExpected);
+		return travelTime;
 	}
 }

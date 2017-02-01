@@ -64,10 +64,10 @@ public class UserDevice extends Thread {
 			String toSend = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
 			MomUtils.sendMsg(this.factory, this.userID, toSend);
 			INodePath selectedPath = evaluateBestPath();
-			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath);
+			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
 			MomUtils.sendMsg(this.factory, selectedPath.getPathNodes().get(0).getNodeID() , ackToSend);
-			IPathAckMsg ackMsgToServer = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath);
+			IPathAckMsg ackMsgToServer = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			//invio al server
 		} catch (Exception e) {
 			e.printStackTrace();
