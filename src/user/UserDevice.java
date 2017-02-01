@@ -3,16 +3,16 @@ package user;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.rabbitmq.client.*;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClient;
 import model.InfrastructureNode;
 import model.Pair;
 import model.interfaces.IInfrastructureNode;
@@ -53,6 +53,7 @@ public class UserDevice extends Thread {
 
 	@Override
 	public void run() {
+		this.startComunication();
 		this.userID = "id1"; //get from server
 		this.host = "ip"; // get from server
 		try {
@@ -102,6 +103,23 @@ public class UserDevice extends Thread {
 			}
 	}
 
+	private void startComunication(){
+	    Vertx vertx = Vertx.vertx();
+	  	HttpClient client = vertx.createHttpClient();
+
+	  	client.websocket(8080, "localhost", "/some-uri", ws -> {
+	      ws.handler(data -> {
+	        System.out.println("Received data " + data.toString("ISO-8859-1"));
+	        try {
+	        	Thread.sleep(500);
+	        	ws.writeBinaryMessage(Buffer.buffer("ping"));
+	        } catch (Exception ex){
+	        	ex.printStackTrace();
+	        }
+	      });
+	      ws.writeBinaryMessage(Buffer.buffer("ping"));
+	    });
+	}
 	
 	private INodePath evaluateBestPath(){
 		int min = Integer.MAX_VALUE;
