@@ -1,4 +1,4 @@
-package model;
+package user;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +13,8 @@ import org.json.JSONObject;
 
 import com.rabbitmq.client.*;
 
+import model.InfrastructureNode;
+import model.Pair;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
 import model.interfaces.msg.ICongestionAlarmMsg;
