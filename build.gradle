@@ -1,16 +1,21 @@
 
 // Apply the java plugin to add support for Java
-apply plugin: 'java'
-apply plugin: 'eclipse' 
+
+plugins {
+  id 'java'
+  id 'application'
+  id 'eclipse'
+  id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    // jcenter()
+    jcenter()
     mavenCentral()    
 }
 
-version = "1.0"
+version = "3.3.3"
 sourceCompatibility = "1.8"
 sourceSets {
     main {
@@ -20,11 +25,9 @@ sourceSets {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.7'
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.7'
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.7'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.7'
-    compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.3.0.M1'
+    
+  	compile 'io.vertx:vertx-core:$version'
+  	compile 'io.vertx:vertx-web:3.3.3'
     compile fileTree(dir: '/lib', include: 'java-json.jar')
     compile fileTree(dir: '/lib', include: 'amqp-client-3.6.5.jar')
 
