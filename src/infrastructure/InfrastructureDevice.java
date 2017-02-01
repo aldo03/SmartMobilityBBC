@@ -43,7 +43,7 @@ public class InfrastructureDevice extends Thread {
 	private ITravelTimesByNumberOfVehicles travelTimes;
 	private IExpectedNumberOfVehicles expectedVehicles;
 	private IPendingUsers pendingUsers;
-
+	
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
