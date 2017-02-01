@@ -8,14 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONException;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
+import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
+import model.interfaces.msg.IRequestPathMsg;
+import model.interfaces.msg.IResponsePathMsg;
+import model.msg.ResponsePathMsg;
+import utils.json.JSONMessagingUtils;
+import utils.messaging.MessagingUtils;
 
 /**
  * class that model Server logic
@@ -23,14 +31,21 @@ import model.interfaces.IPair;
  * @author BBC
  *
  */
-public class MainServer extends Thread {
+public class MainServer {
 
+	private final static String USER_ID = "User-Device-";
 	private Map<String, Set<IPair<String, Integer>>> graph;
-	private Set<IInfrastructureNodeImpl> nodesSet;
+	private Set<IInfrastructureNode> nodesSet;
+	private int userSeed;
 
 	public MainServer() throws Exception {
 		this.graph = new HashMap<>();
 		this.nodesSet = new HashSet<>();
+		this.userSeed = 0;
+		this.initVertx();
+	}
+
+	private void initVertx() {
 		Vertx vertx = Vertx.vertx();
 		Router router = Router.router(vertx);
 
@@ -63,20 +78,51 @@ public class MainServer extends Thread {
 		// Create the HTTP server and pass the "accept" method to the request
 		// handler.
 
-		//State state = new State();
-
 		vertx.createHttpServer().websocketHandler(ws -> {
 			System.out.println("WebSocket opened!");
 			ws.handler(hnd -> {
 				System.out.println("data received: " + hnd.toString());
-				//state.update();
-				Buffer buffer = Buffer.buffer().appendString("pong-");
-				ws.write(buffer);
+				try {
+					int n;
+					n = MessagingUtils.getIntId(hnd.toString());
+					switch (n) {
+					case 1:
+						
+						break;
+					case 2:
+						this.handleRequestPathMsg(ws, hnd.toString());
+						break;
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} 
 			});
 			// if (req.uri().equals("/"))
 			// req.response().sendFile(path+"/ws.html");
 		}).requestHandler(router::accept).listen(8080);
+	}
 
+	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException {
+		int count = 1;
+		while(count<2){
+
+		}
+		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
+		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
+		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
+		IResponsePathMsg responsePathMsg = new ResponsePathMsg(this.generateUserID(), MessagingUtils.RESPONSE_PATH, pathList, brokerAddress);
+		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
+		Buffer buffer = Buffer.buffer().appendString(response);
+		ws.write(buffer);
+	}
+	
+	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
+		//TODO genearate broker address
+		return "localhost";
+	}
+
+	private String generateUserID(){
+		return USER_ID + this.userSeed++;
 	}
 
 	/**
@@ -86,7 +132,7 @@ public class MainServer extends Thread {
 	 * @param finish
 	 * @return list of shortest path
 	 */
-	public List<INodePath> getShortestPaths(IInfrastructureNodeImpl start, IInfrastructureNodeImpl finish) {
+	public List<INodePath> getShortestPaths(IInfrastructureNode start, IInfrastructureNode finish) {
 		List<INodePath> pathList = new ArrayList<>();
 		// TODO short path algorithm
 		return pathList;
@@ -97,10 +143,10 @@ public class MainServer extends Thread {
 	 * 
 	 * @param nodesSet
 	 */
-	public void setNodes(Set<IInfrastructureNodeImpl> nodesSet) {
+	public void setNodes(Set<IInfrastructureNode> nodesSet) {
 		this.nodesSet = nodesSet;
-		for (IInfrastructureNodeImpl node : this.nodesSet)
-			this.graph.put(node.getNodeID(), node.getNearNodesWeighted());
+		for (IInfrastructureNode node : this.nodesSet)
+			this.graph.put(node.getNodeID(), ((IInfrastructureNodeImpl) node).getNearNodesWeighted());
 	}
 
 	/**
