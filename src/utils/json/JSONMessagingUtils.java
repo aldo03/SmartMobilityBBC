@@ -40,6 +40,7 @@ public class JSONMessagingUtils {
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(USER_ID, msg.getUserID());
 		obj.put(PATH, new JSONNodePath(msg.getPath()));
+		obj.put(TRAVEL_ID, msg.getTravelID());
 		return obj.toString();
 	}
 	
@@ -102,14 +103,14 @@ public class JSONMessagingUtils {
 	public static IPathAckMsg getPathAckMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathfromJSONArray(obj.getJSONArray(PATH));
-		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path);
+		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path, obj.getInt(TRAVEL_ID));
 		return msg;
 	}
 	
 	public static IPathAckMsg getPathAckWithCoordinatesMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathWithCoordinatesfromJSONArray(obj.getJSONArray(PATH));
-		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path);
+		IPathAckMsg msg = new PathAckMsg(obj.getString(USER_ID), obj.getString(MSG_ID), path, obj.getInt(TRAVEL_ID));
 		return msg;
 	}
 	

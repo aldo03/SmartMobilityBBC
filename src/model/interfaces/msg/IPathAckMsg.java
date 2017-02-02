@@ -16,4 +16,10 @@ public interface IPathAckMsg extends IUserMobilityMsg {
 	 * @return path
 	 */
 	INodePath getPath();
+	
+	/**
+	 * gets the ID of the travel
+	 * @return travel ID
+	 */
+	int getTravelID();
 }

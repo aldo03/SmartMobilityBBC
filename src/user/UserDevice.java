@@ -18,6 +18,8 @@ import model.Coordinates;
 import model.InfrastructureNode;
 import model.InfrastructureNodeImpl;
 import model.Pair;
+import model.interfaces.ICoordinates;
+import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
@@ -30,11 +32,12 @@ import model.interfaces.msg.IResponseTravelTimeMsg;
 import model.msg.PathAckMsg;
 import model.msg.RequestPathMsg;
 import model.msg.RequestTravelTimeMsg;
+import utils.gps.GpsMock;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
-public class UserDevice extends Thread {
+public class UserDevice extends Thread implements IGPSObserver {
 
 	private String userID;
 	private String host;
@@ -65,10 +68,10 @@ public class UserDevice extends Thread {
 			this.startReceiving();
 			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
 			INodePath selectedPath = evaluateBestPath();
-			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath);
+			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
 			MomUtils.sendMsg(this.factory, selectedPath.getPathNodes().get(0).getNodeID(), ackToSend);
-			IPathAckMsg ackMsgToServer = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath);
+			IPathAckMsg ackMsgToServer = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			// invio al server
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -185,6 +188,9 @@ public class UserDevice extends Thread {
 	private void handlePathAckMsg(String msg) throws JSONException {
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
+		GpsMock gps = new GpsMock(this.chosenPath, new ArrayList<>());  //TODO: we have to find a way to create a mock path with mock times
+		gps.attachObserver(this);
+		gps.start();
 	}
 
 	private void handleResponsePathMsg(String msg)
@@ -209,6 +215,11 @@ public class UserDevice extends Thread {
 		int id = message.getTravelID();
 		int time = message.getTravelTime();
 		this.travelTimes.add(new Pair<Integer, Integer>(id, time));
+	}
+	
+	@Override
+	public void notify(ICoordinates coordinates) {
+		
 	}
 
 }
