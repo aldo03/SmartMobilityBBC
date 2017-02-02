@@ -1,7 +1,6 @@
 package server;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONException;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
@@ -37,7 +35,7 @@ public class MainServer {
 	private Map<String, Set<IPair<String, Integer>>> graph;
 	private Set<IInfrastructureNode> nodesSet;
 	private int userSeed;
-
+	
 	public MainServer() throws Exception {
 		this.graph = new HashMap<>();
 		this.nodesSet = new HashSet<>();
@@ -77,7 +75,7 @@ public class MainServer {
 
 		// Create the HTTP server and pass the "accept" method to the request
 		// handler.
-
+		vertx.createHttpServer();
 		vertx.createHttpServer().websocketHandler(ws -> {
 			System.out.println("WebSocket opened!");
 			ws.handler(hnd -> {
@@ -90,7 +88,18 @@ public class MainServer {
 						
 						break;
 					case 2:
-						this.handleRequestPathMsg(ws, hnd.toString());
+						Thread t = new Thread(){
+							@Override
+							public void run() {
+								try {
+									handleRequestPathMsg(ws, hnd.toString());
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+							}
+							
+						};
+						t.start();
 						break;
 					}
 				} catch (JSONException e) {
@@ -102,11 +111,7 @@ public class MainServer {
 		}).requestHandler(router::accept).listen(8080);
 	}
 
-	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException {
-		int count = 1;
-		while(count<2){
-
-		}
+	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException{
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
 		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
@@ -117,7 +122,7 @@ public class MainServer {
 	}
 	
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
-		//TODO genearate broker address
+		//TODO generate broker address
 		return "localhost";
 	}
 
