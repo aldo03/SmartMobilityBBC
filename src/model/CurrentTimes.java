@@ -45,4 +45,9 @@ public class CurrentTimes implements ICurrentTimes {
 		}
 	}
 
+	@Override
+	public int getVehicleCount(String nodeId) {
+		return this.currentTimes.get(nodeId).size();
+	}
+
 }

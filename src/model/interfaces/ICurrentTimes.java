@@ -28,6 +28,12 @@ public interface ICurrentTimes {
 	 */
 	int getAverageTime(String nodeId);
 	
+	/**
+	 * returns the amount of vehicles detected through a certain node
+	 * @param nodeId
+	 * @return
+	 */
+	int getVehicleCount(String nodeId);
 	
 	/**
 	 * remove the current collections
