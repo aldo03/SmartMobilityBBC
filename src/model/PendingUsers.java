@@ -32,9 +32,9 @@ public class PendingUsers implements IPendingUsers {
 				this.pendingUsers.put(userId, set);
 			}
 		}
-		for(Set<IPair<Integer,Integer>> s : this.pendingUsers.values()){
+		/*for(Set<IPair<Integer,Integer>> s : this.pendingUsers.values()){
 			//delete "non fresh" values
-		}
+		}*/
 	}
 
 	@Override

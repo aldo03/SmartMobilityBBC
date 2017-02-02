@@ -18,6 +18,8 @@ import model.Coordinates;
 import model.InfrastructureNode;
 import model.InfrastructureNodeImpl;
 import model.Pair;
+import model.interfaces.ICoordinates;
+import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
@@ -32,11 +34,12 @@ import model.msg.PathAckMsg;
 import model.msg.RequestPathMsg;
 import model.msg.RequestTravelTimeMsg;
 import model.msg.TravelTimeAckMsg;
+import utils.gps.GpsMock;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
-public class UserDevice extends Thread {
+public class UserDevice extends Thread implements IGPSObserver {
 
 	private String userID;
 	private String host;
@@ -46,7 +49,6 @@ public class UserDevice extends Thread {
 	private INodePath chosenPath;
 	private InfrastructureNodeImpl start;
 	private InfrastructureNodeImpl end;
-	List<IInfrastructureNode> nodes;
 
 	private Channel initChannel() throws IOException, TimeoutException {
 		this.factory = new ConnectionFactory();
@@ -67,14 +69,11 @@ public class UserDevice extends Thread {
 		try {
 			this.startReceiving();
 			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
-			evaluateBestPath();
-			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, chosenPath, 0);
+			INodePath selectedPath = evaluateBestPath();
+			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
 			MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
 			// invio al server
-			for(int i = 0; i < this.chosenPath.getPathNodes().size(); i++){
-				//this.nearNextNode(chosenPath, i, time);
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -190,6 +189,9 @@ public class UserDevice extends Thread {
 	private void handlePathAckMsg(String msg) throws JSONException {
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
+		GpsMock gps = new GpsMock(this.chosenPath, new ArrayList<>());  //TODO: we have to find a way to create a mock path with mock times
+		gps.attachObserver(this);
+		gps.start();
 	}
 
 	private void handleResponsePathMsg(String msg)
@@ -221,6 +223,10 @@ public class UserDevice extends Thread {
 				chosenPath.getPathNodes().get(index), chosenPath.getPathNodes().get(index + 1), time);
 		String travelTimeAck = JSONMessagingUtils.getStringfromTravelTimeAckMsg(msg);
 		MomUtils.sendMsg(this.factory, chosenPath.getPathNodes().get(index).getNodeID(), travelTimeAck);
+	}
+
+	@Override
+	public void notify(ICoordinates coordinates) {		
 	}
 
 }

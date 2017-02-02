@@ -15,10 +15,15 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import model.CurrentTimes;
 import model.ExpectedNumberOfVehicles;
 import model.PendingUsers;
 import model.TravelTimesByNumberOfVehicles;
+import model.UpdateTravelTimesThread;
+import model.interfaces.ICoordinates;
+import model.interfaces.ICurrentTimes;
 import model.interfaces.IExpectedNumberOfVehicles;
+import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
@@ -35,7 +40,7 @@ import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
-public class InfrastructureDevice extends Thread {
+public class InfrastructureDevice extends Thread{
 	private String id;
 	private Set<IPair<String, Integer>> nearNodesWeighted;
 	private String brokerHost;
@@ -43,7 +48,8 @@ public class InfrastructureDevice extends Thread {
 	private ITravelTimesByNumberOfVehicles travelTimes;
 	private IExpectedNumberOfVehicles expectedVehicles;
 	private IPendingUsers pendingUsers;
-
+	private ICurrentTimes curTimes;
+	
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
@@ -54,10 +60,14 @@ public class InfrastructureDevice extends Thread {
 		this.travelTimes = new TravelTimesByNumberOfVehicles();
 		this.expectedVehicles = new ExpectedNumberOfVehicles();
 		this.pendingUsers = new PendingUsers();
+		this.curTimes = new CurrentTimes();
 		for(IPair<String, Integer> p : this.nearNodesWeighted){
 			this.travelTimes.initTravelTimes(p.getFirst(), p.getSecond());
 			this.expectedVehicles.initVehicles(p.getFirst());
+			this.curTimes.initTimes(p.getFirst());
 		}
+		UpdateTravelTimesThread thread = new UpdateTravelTimesThread(this.curTimes, this.travelTimes);
+		thread.start();
 	}
 	
 
@@ -149,8 +159,10 @@ public class InfrastructureDevice extends Thread {
 		}
 	}
 
+	//sets the travel time acked as one of the current times of the specific path
 	private void handleTravelTimeAckMsg(String message) throws JSONException {
 		ITravelTimeAckMsg msg = JSONMessagingUtils.getTravelTimeAckMsgFromString(message);
+		this.curTimes.addTime(msg.getSecondNode().getNodeID(), msg.getTravelTime());
 	}
 
 	//returns the travel time expected to a certain node at a certain time
@@ -159,4 +171,6 @@ public class InfrastructureDevice extends Thread {
 		int travelTime = this.travelTimes.getTravelTime(node.getNodeID(), numOfVehiclesExpected);
 		return travelTime;
 	}
+
+
 }
