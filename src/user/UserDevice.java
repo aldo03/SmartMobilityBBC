@@ -27,9 +27,11 @@ import model.interfaces.msg.IRequestPathMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;
 import model.interfaces.msg.IResponsePathMsg;
 import model.interfaces.msg.IResponseTravelTimeMsg;
+import model.interfaces.msg.ITravelTimeAckMsg;
 import model.msg.PathAckMsg;
 import model.msg.RequestPathMsg;
 import model.msg.RequestTravelTimeMsg;
+import model.msg.TravelTimeAckMsg;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
@@ -44,6 +46,7 @@ public class UserDevice extends Thread {
 	private INodePath chosenPath;
 	private InfrastructureNodeImpl start;
 	private InfrastructureNodeImpl end;
+	List<IInfrastructureNode> nodes;
 
 	private Channel initChannel() throws IOException, TimeoutException {
 		this.factory = new ConnectionFactory();
@@ -64,12 +67,14 @@ public class UserDevice extends Thread {
 		try {
 			this.startReceiving();
 			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
-			INodePath selectedPath = evaluateBestPath();
-			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
+			evaluateBestPath();
+			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, chosenPath, 0);
 			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
-			MomUtils.sendMsg(this.factory, selectedPath.getPathNodes().get(0).getNodeID(), ackToSend);
-			IPathAckMsg ackMsgToServer = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
+			MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
 			// invio al server
+			for(int i = 0; i < this.chosenPath.getPathNodes().size(); i++){
+				//this.nearNextNode(chosenPath, i, time);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -209,6 +214,13 @@ public class UserDevice extends Thread {
 		int id = message.getTravelID();
 		int time = message.getTravelTime();
 		this.travelTimes.add(new Pair<Integer, Integer>(id, time));
+	}
+	
+	private void nearNextNode(INodePath chosenPath, int index, int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
+		ITravelTimeAckMsg msg = new TravelTimeAckMsg(this.userID, MessagingUtils.TRAVEL_TIME_ACK,
+				chosenPath.getPathNodes().get(index), chosenPath.getPathNodes().get(index + 1), time);
+		String travelTimeAck = JSONMessagingUtils.getStringfromTravelTimeAckMsg(msg);
+		MomUtils.sendMsg(this.factory, chosenPath.getPathNodes().get(index).getNodeID(), travelTimeAck);
 	}
 
 }
