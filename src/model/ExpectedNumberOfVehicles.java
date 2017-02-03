@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 import model.interfaces.IExpectedNumberOfVehicles;
+import utils.mongodb.MongoDBUtils;
 
 public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 
 	private Map<String, List<Integer>> vehicles;  //every element of the list is the absolute time (in seconds)
 												  //in which a single vehicle is expected to perform a certain path from a node to another
 	private static final int RANGE = 3000;        //range (in seconds) within which the flow of vehicles must be checked
-	
-	public ExpectedNumberOfVehicles(){
+	private String nodeId;
+	public ExpectedNumberOfVehicles(String nodeId){
 		this.vehicles = new HashMap<>();
+		this.nodeId = nodeId;
+		MongoDBUtils.intExpectedVehicles(nodeId);
 	}
 	
 	

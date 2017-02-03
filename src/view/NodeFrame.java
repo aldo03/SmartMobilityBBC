@@ -81,6 +81,7 @@ public class NodeFrame extends JFrame implements WindowListener {
     		table.setValueAt(neighbors.get(j).getNodeID(), j, 0);
     	}
     	JScrollPane scrollPane = new JScrollPane(table);
+    	scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     	scrollPane.add(new JButton("AAA"));
     	scrollPane.repaint();
     	

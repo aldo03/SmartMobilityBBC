@@ -6,13 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 import model.interfaces.ICurrentTimes;
+import utils.mongodb.MongoDBUtils;
 
 public class CurrentTimes implements ICurrentTimes {
 
 	private Map<String, List<Integer>> currentTimes;
+	private String nodeId;
 	
-	public CurrentTimes(){
+	public CurrentTimes(String nodeId){
 		this.currentTimes = new HashMap<>();
+		this.nodeId = nodeId;
+		MongoDBUtils.initCurrentTime(nodeId);
 	}
 	
 	@Override

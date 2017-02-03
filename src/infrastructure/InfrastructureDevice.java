@@ -58,10 +58,10 @@ public class InfrastructureDevice extends Thread{
 	}
 	
 	private void initializeDataStructures(){
-		this.travelTimes = new TravelTimesByNumberOfVehicles();
-		this.expectedVehicles = new ExpectedNumberOfVehicles();
+		this.travelTimes = new TravelTimesByNumberOfVehicles(this.id);
+		this.expectedVehicles = new ExpectedNumberOfVehicles(this.id);
 		this.pendingUsers = new PendingUsers();
-		this.curTimes = new CurrentTimes();
+		this.curTimes = new CurrentTimes(this.id);
 		for(IPair<String, Integer> p : this.nearNodesWeighted){
 			this.travelTimes.initTravelTimes(p.getFirst(), p.getSecond());
 			this.expectedVehicles.initVehicles(p.getFirst());
