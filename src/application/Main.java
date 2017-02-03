@@ -3,7 +3,7 @@ package application;
 import server.MainServer;
 import user.UserDevice;
 import view.MainView;
-import view.NodeFrame;
+import view.NodeView;
 
 public class Main {
 
@@ -24,8 +24,8 @@ public class Main {
 		device6.start();
 <<<<<<< HEAD
 		device7.start();*/
-		//MainView view = new MainView();
-		NodeFrame f = new NodeFrame("IdNode1");
+		MainView view = new MainView();
+		//NodeView f = new NodeView("IdNode1");
 	}
 
 }
