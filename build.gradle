@@ -30,6 +30,7 @@ dependencies {
   	compile 'io.vertx:vertx-web:3.3.3'
     compile fileTree(dir: '/lib', include: 'java-json.jar')
     compile fileTree(dir: '/lib', include: 'amqp-client-3.6.5.jar')
+    compile 'org.mongodb:mongodb-driver:3.4.2'
 
 
     // The production code uses the SLF4J logging API at compile time

@@ -18,4 +18,10 @@ public interface INodePath {
 	 * removes the head of the list
 	 */
 	void removeFirstNode();
+	
+	/**
+	 * set the path
+	 * @param path
+	 */
+	void setPath(List<IInfrastructureNode> path);
 }

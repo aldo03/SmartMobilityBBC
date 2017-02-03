@@ -13,12 +13,15 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
+import model.NodePath;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
+import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestPathMsg;
 import model.interfaces.msg.IResponsePathMsg;
+import model.msg.PathAckMsg;
 import model.msg.ResponsePathMsg;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
@@ -85,10 +88,21 @@ public class MainServer {
 					n = MessagingUtils.getIntId(hnd.toString());
 					switch (n) {
 					case 1:
-						
+						Thread t1 = new Thread(){
+							@Override
+							public void run() {
+								try {
+									handlePathAckMsg(ws, hnd.toString());
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+							}
+							
+						};
+						t1.start();
 						break;
 					case 2:
-						Thread t = new Thread(){
+						Thread t2 = new Thread(){
 							@Override
 							public void run() {
 								try {
@@ -99,7 +113,7 @@ public class MainServer {
 							}
 							
 						};
-						t.start();
+						t2.start();
 						break;
 					}
 				} catch (JSONException e) {
@@ -121,11 +135,30 @@ public class MainServer {
 		ws.write(buffer);
 	}
 	
+
+
+	private void handlePathAckMsg(ServerWebSocket ws, String msg) throws JSONException {
+		IPathAckMsg pathAckMsg = JSONMessagingUtils.getPathAckMsgFromString(msg);
+		List<IInfrastructureNode> pathWithCoordinates = new ArrayList<>();
+		INodePath pathFromMsg = pathAckMsg.getPath();
+		for(IInfrastructureNode node: pathFromMsg.getPathNodes()){
+			for(IInfrastructureNode n: this.nodesSet){
+				if(node.getNodeID().equals(n.getNodeID()))
+					pathWithCoordinates.add(n);
+			}
+		}
+		INodePath path = new NodePath(pathWithCoordinates);
+		IPathAckMsg coordinatesMsg = new PathAckMsg(pathAckMsg.getUserID(),MessagingUtils.PATH_ACK,path,pathAckMsg.getTravelID());
+		String response = JSONMessagingUtils.getStringfromPathAckMsg(coordinatesMsg);
+		Buffer buffer = Buffer.buffer().appendString(response);
+		ws.write(buffer);
+	}
+	
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
 		//TODO generate broker address
 		return "localhost";
 	}
-
+	
 	private String generateUserID(){
 		return USER_ID + this.userSeed++;
 	}

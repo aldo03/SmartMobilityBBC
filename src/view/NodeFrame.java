@@ -1,94 +1,91 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 
-public class NodeFrame extends JFrame implements ActionListener, WindowListener {
+import model.InfrastructureNode;
+import model.interfaces.IInfrastructureNode;
+
+public class NodeFrame extends JFrame implements WindowListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel panel;
-	private static final String IM_BACKGROUND = "/ImmaginePiccola.png";
-	private ImageIcon background;
-	private int width;
-	private int height;
-	private JMenuBar menuBar;
-	private JMenu menu;
-	private JRadioButtonMenuItem travelTimes;
-	private JRadioButtonMenuItem currentTimes;
-	private JRadioButtonMenuItem expectedVehicles;
-	private ButtonGroup group;
-	private Dimension dim;
-
-	
-	
-	
+	final static int extraWindowWidth = 500;
+	final static String TRAVEL_TIMES = "Travel Times";
+    final static String EXPECTED_VEHICLES = "Expected vehicles";
+    final static String CURRENT_TIMES = "Current Times";
+    
 	public NodeFrame(String nodeID){
-		super();
-		this.setResizable(false);
-		Dimension d = new Dimension(400,400);
-		this.setMaximumSize(d);
-		this.setSize(d);
-		this.setTitle("View");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.addWindowListener(this);
-		this.dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation((this.dim.width - d.width) / 2,
-				(this.dim.height - d.height) / 2);
-		this.setVisible(true);
-		//imposta il backround del panel
-		this.panel = new JPanel();
-		this.background = new ImageIcon(getClass().getResource(IM_BACKGROUND));
-		this.setSize(background.getIconWidth(), background.getIconHeight());
-
-		this.width = this.getWidth();
-		this.height = this.getHeight();
-		
-		this.setLayout(new FlowLayout(FlowLayout.CENTER, 1000, 150));
-		
-		this.menuBar = new JMenuBar();
-		this.menu = new JMenu();
-		this.group = new ButtonGroup();
-		this.travelTimes = new JRadioButtonMenuItem("Travel Times");
-		this.currentTimes = new JRadioButtonMenuItem("Current times");
-		this.expectedVehicles = new JRadioButtonMenuItem("Expected vehicles");
-		this.group.add(this.travelTimes);
-		this.group.add(this.currentTimes);
-		this.group.add(this.expectedVehicles);
-		this.menu.add(this.travelTimes);
-		this.menu.add(this.currentTimes);
-		this.menu.add(this.expectedVehicles);
-		this.menuBar.add(menu);
-		this.setJMenuBar(this.menuBar);
-
-		this.panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
-		this.panel.setPreferredSize(new Dimension(this.width, this.height));
-		this.panel.setOpaque(false);
-		
-		this.panel.add(new JLabel(nodeID), FlowLayout.LEFT);
-		
-
-
+		initGUI(this);
+		this.addComponentToPane(this.getContentPane());
 	}
-
-
-
-
-	@Override
-	public void actionPerformed(ActionEvent e) {		
+	
+	private void initGUI(JFrame frame){
+		frame.setResizable(true);
+		Dimension d = new Dimension(500,100);
+		frame.setMaximumSize(d);
+		frame.setSize(d);
+		frame.setTitle("Main view");
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		frame.setVisible(true);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation((dim.width) / 2,
+				(dim.height) / 2);
 	}
+	
+    public void addComponentToPane(Container pane) {
+        JTabbedPane tabbedPane = new JTabbedPane();
 
+        //Create the "cards".
+        JPanel card1 = new JPanel() {
+            //Make the panel wider than it really needs, so
+            //the window's wide enough for the tabs to stay
+            //in one row.
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                size.width += extraWindowWidth;
+                return size;
+            }
+        };
+        
+        
+        List<InfrastructureNode> neighbors = new ArrayList<InfrastructureNode>();
+        neighbors.add(new InfrastructureNode("Node2"));
+        neighbors.add(new InfrastructureNode("Node3"));
+        neighbors.add(new InfrastructureNode("Node4"));
+        card1.add(this.addTravelTimesTable(neighbors));
 
+        JPanel card2 = new JPanel();
+        card2.add(new JTextField("TextField", 20));
 
+        tabbedPane.addTab(TRAVEL_TIMES, card1);
+        tabbedPane.addTab(EXPECTED_VEHICLES, card2);
+
+        pane.add(tabbedPane, BorderLayout.CENTER);
+    }
+    
+    
+    private JScrollPane addTravelTimesTable(List<InfrastructureNode> neighbors){
+    	JTable table = new JTable(neighbors.size(), 201);
+    	for(int j = 0; j < table.getRowCount(); j++){
+    		table.setValueAt(neighbors.get(j).getNodeID(), j, 0);
+    	}
+    	JScrollPane scrollPane = new JScrollPane(table);
+    	scrollPane.add(new JButton("AAA"));
+    	scrollPane.repaint();
+    	
+    	return scrollPane;
+    }
 
 	@Override
 	public void windowOpened(WindowEvent e) {
@@ -96,17 +93,11 @@ public class NodeFrame extends JFrame implements ActionListener, WindowListener 
 		
 	}
 
-
-
-
 	@Override
 	public void windowClosing(WindowEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
-
-
 
 	@Override
 	public void windowClosed(WindowEvent e) {
@@ -114,17 +105,11 @@ public class NodeFrame extends JFrame implements ActionListener, WindowListener 
 		
 	}
 
-
-
-
 	@Override
 	public void windowIconified(WindowEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
-
-
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
@@ -132,22 +117,16 @@ public class NodeFrame extends JFrame implements ActionListener, WindowListener 
 		
 	}
 
-
-
-
 	@Override
 	public void windowActivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-
-
-
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 }
