@@ -23,4 +23,9 @@ public class NodePath implements INodePath {
 		this.pathNodes.remove(0);
 	}
 
+	@Override
+	public void setPath(List<IInfrastructureNode> path) {
+		this.pathNodes = path;
+	}
+
 }

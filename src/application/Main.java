@@ -22,6 +22,7 @@ public class Main {
 		device4.start();
 		device5.start();
 		device6.start();
+<<<<<<< HEAD
 		device7.start();*/
 		//MainView view = new MainView();
 		NodeFrame f = new NodeFrame("IdNode1");

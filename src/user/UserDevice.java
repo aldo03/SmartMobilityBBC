@@ -17,6 +17,7 @@ import io.vertx.core.http.HttpClient;
 import model.Coordinates;
 import model.InfrastructureNode;
 import model.InfrastructureNodeImpl;
+import model.NodePath;
 import model.Pair;
 import model.interfaces.ICoordinates;
 import model.interfaces.IGPSObserver;
@@ -42,17 +43,24 @@ import utils.mom.MomUtils;
 public class UserDevice extends Thread implements IGPSObserver {
 
 	private String userID;
-	private String host;
+	private String brokerAddress;
 	private ConnectionFactory factory;
+	private Integer travelID;
 	private List<Pair<INodePath, Integer>> pathsWithTravelID;
 	private List<Pair<Integer, Integer>> travelTimes;
 	private INodePath chosenPath;
 	private InfrastructureNodeImpl start;
 	private InfrastructureNodeImpl end;
 
+	public UserDevice(){
+		this.travelID = 0;
+		this.userID = "id1";
+		this.chosenPath = new NodePath(new ArrayList<>());
+	}
+	
 	private Channel initChannel() throws IOException, TimeoutException {
 		this.factory = new ConnectionFactory();
-		this.factory.setHost(host);
+		this.factory.setHost(brokerAddress);
 		Connection connection = this.factory.newConnection();
 		Channel channel = connection.createChannel();
 		channel.queueDeclare("receiveQueue", false, false, false, null);
@@ -63,9 +71,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	@Override
 	public void run() {
 		this.initNodes();
-		this.initVertx(start, end);
-		this.userID = "id1"; // get from server
-		this.host = "localhost"; // get from server
+		this.requestPaths(start, end);
 		try {
 			this.startReceiving();
 			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
@@ -119,10 +125,9 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 
-	private void initVertx(IInfrastructureNode start, IInfrastructureNode end) {
+	private void requestPaths(IInfrastructureNode start, IInfrastructureNode end) {
 		Vertx vertx = Vertx.vertx();
 		HttpClient client = vertx.createHttpClient();
-
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
 			ws.handler(data -> {
 				System.out.println("Received data " + data.toString("ISO-8859-1"));
@@ -200,6 +205,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 		IResponsePathMsg message = JSONMessagingUtils.getResponsePathMsgFromString(msg);
 		List<INodePath> paths;
 		paths = message.getPaths();
+		this.userID = message.getUserID();
+		this.brokerAddress = message.getBrokerAddress();
 		for (int j = 0; j < paths.size(); j++) {
 			this.pathsWithTravelID.add(new Pair<INodePath, Integer>(paths.get(j), j));
 		}
@@ -209,13 +216,17 @@ public class UserDevice extends Thread implements IGPSObserver {
 			String toSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(requestMsg);
 			MomUtils.sendMsg(factory, userID, toSend);
 		}
+		List<IInfrastructureNode> path = new ArrayList<>();
+		path.add(this.start);
+		path.add(this.end);
+		this.chosenPath.setPath(path);
 	}
 
 	private void handleResponseTravelTimeMsg(String msg) throws JSONException {
 		IResponseTravelTimeMsg message = JSONMessagingUtils.getResponseTravelTimeMsgFromString(msg);
-		int id = message.getTravelID();
+		this.travelID = message.getTravelID();
 		int time = message.getTravelTime();
-		this.travelTimes.add(new Pair<Integer, Integer>(id, time));
+		this.travelTimes.add(new Pair<Integer, Integer>(this.travelID, time));
 	}
 	
 	private void nearNextNode(INodePath chosenPath, int index, int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
@@ -228,5 +239,29 @@ public class UserDevice extends Thread implements IGPSObserver {
 	@Override
 	public void notify(ICoordinates coordinates) {		
 	}
+	
+	public void requestCoordinates(){
+		Vertx vertx = Vertx.vertx();
+		HttpClient client = vertx.createHttpClient();
+
+		client.websocket(8080, "localhost", "/some-uri", ws -> {
+			ws.handler(data -> {
+				System.out.println("Received data " + data.toString("ISO-8859-1"));
+				try {
+					this.handlePathAckMsg(data.toString());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			});
+			IPathAckMsg pathAckMsg = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
+			try {
+				String pathAckString = JSONMessagingUtils.getStringfromPathAckMsg(pathAckMsg);
+				ws.writeBinaryMessage(Buffer.buffer(pathAckString));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
 
 }
