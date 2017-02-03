@@ -17,24 +17,25 @@ public class MainView extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = 1L;
 	private MainPanel mainPanel;
-	private ImageIcon background = new ImageIcon(getClass().getResource("/ImmaginePiccola.png"));
-	private Dimension dim;
 	
 	public MainView(){
 		this.mainPanel = new MainPanel();
-		this.setResizable(false);
-		Dimension d = new Dimension(this.background.getIconWidth(),
-				this.background.getIconHeight());
-		this.setMaximumSize(d);
-		this.setSize(d);
-		this.setTitle("View");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		initGUI(this);
 		this.addWindowListener(this);
 		this.getContentPane().add(this.mainPanel);
-		this.dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation((this.dim.width - d.width) / 2,
-				(this.dim.height - d.height) / 2);
-		this.setVisible(true);
+	}
+	
+	private void initGUI(JFrame frame){
+		frame.setResizable(false);
+		Dimension d = new Dimension(500,100);
+		frame.setMaximumSize(d);
+		frame.setSize(d);
+		frame.setTitle("Main view");
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		frame.setVisible(true);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation((dim.width) / 2,
+				(dim.height) / 2);
 	}
 
 	@Override
