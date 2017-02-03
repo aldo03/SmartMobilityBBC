@@ -21,6 +21,7 @@ public class Main {
 		device5.start();
 		device6.start();
 		device7.start();
+		device1.requestCoordinates();
 	}
 
 }
