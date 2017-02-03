@@ -5,17 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import model.interfaces.ITravelTimesByNumberOfVehicles;
+import utils.mongodb.MongoDBUtils;
 
 
 
 public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehicles {
 	private static final int RANGE = 5;
 	private static final int ARRAY_LENGTH = 200;
+	private String nodeId;
 	
 	private Map<String, int[]> travelTimes;
 	
-	public TravelTimesByNumberOfVehicles(){
+	public TravelTimesByNumberOfVehicles(String nodeId){
 		this.travelTimes = new HashMap<>();
+		this.nodeId = nodeId;
+		MongoDBUtils.intTimes(nodeId);
 	}
 	
 	
@@ -41,6 +45,7 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 			times[i] = defaultValue;
 		}
 		this.travelTimes.put(nodeId, times);
+		MongoDBUtils.initTravelTimes(this.nodeId, nodeId, times);
 	}
 
 

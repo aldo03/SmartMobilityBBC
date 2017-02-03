@@ -2,11 +2,13 @@ package application;
 
 import server.MainServer;
 import user.UserDevice;
+import view.MainView;
+import view.NodeView;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		MainServer server = new MainServer();
+		/*MainServer server = new MainServer();
 		UserDevice device1 = new UserDevice();
 		UserDevice device2 = new UserDevice();
 		UserDevice device3 = new UserDevice();
@@ -20,8 +22,10 @@ public class Main {
 		device4.start();
 		device5.start();
 		device6.start();
-		device7.start();
-		device1.requestCoordinates();
+<<<<<<< HEAD
+		device7.start();*/
+		MainView view = new MainView();
+		//NodeView f = new NodeView("IdNode1");
 	}
 
 }

@@ -17,4 +17,12 @@ public interface ICoordinates {
 	 * @return longitude
 	 */
 	double getLongitude();
+	
+	
+	/**
+	 * tells if the coordinates are close enough
+	 * @param coordinates
+	 * @return true if the coordinates are close enough, false otherwise
+	 */
+	boolean isCloseEnough(ICoordinates coordinates);
 }

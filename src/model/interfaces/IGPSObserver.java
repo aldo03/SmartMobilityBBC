@@ -11,5 +11,5 @@ public interface IGPSObserver {
 	 * coordinates are passed to the observer
 	 * @param coordinates
 	 */
-	void notify(ICoordinates coordinates);
+	void notifyGps(ICoordinates coordinates);
 }
