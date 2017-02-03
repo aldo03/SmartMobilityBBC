@@ -54,7 +54,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	public UserDevice(){
 		this.travelID = 0;
-		this.userID = "id";
+		this.userID = "id1";
 		this.chosenPath = new NodePath(new ArrayList<>());
 	}
 	
