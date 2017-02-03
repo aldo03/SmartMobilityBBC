@@ -53,6 +53,7 @@ public class InfrastructureDevice extends Thread{
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
+		this.brokerHost = brokerHost;
 		this.initializeDataStructures();
 	}
 	

@@ -15,13 +15,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import model.Coordinates;
-import model.InfrastructureNode;
 import model.InfrastructureNodeImpl;
 import model.Pair;
 import model.interfaces.ICoordinates;
 import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
-import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
 import model.interfaces.msg.ICongestionAlarmMsg;
 import model.interfaces.msg.IPathAckMsg;
@@ -49,6 +47,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private INodePath chosenPath;
 	private InfrastructureNodeImpl start;
 	private InfrastructureNodeImpl end;
+	private int currentIndex;
+	private long timerValue;
 
 	private Channel initChannel() throws IOException, TimeoutException {
 		this.factory = new ConnectionFactory();
@@ -70,6 +70,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 			this.startReceiving();
 			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
 			INodePath selectedPath = evaluateBestPath();
+			this.currentIndex = 0;
+			this.timerValue = System.currentTimeMillis();
 			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
 			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
 			MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
@@ -218,15 +220,22 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.travelTimes.add(new Pair<Integer, Integer>(id, time));
 	}
 	
-	private void nearNextNode(INodePath chosenPath, int index, int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
+	private void nearNextNode(int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
 		ITravelTimeAckMsg msg = new TravelTimeAckMsg(this.userID, MessagingUtils.TRAVEL_TIME_ACK,
-				chosenPath.getPathNodes().get(index), chosenPath.getPathNodes().get(index + 1), time);
+				chosenPath.getPathNodes().get(this.currentIndex), this.chosenPath.getPathNodes().get(this.currentIndex + 1), time);
 		String travelTimeAck = JSONMessagingUtils.getStringfromTravelTimeAckMsg(msg);
-		MomUtils.sendMsg(this.factory, chosenPath.getPathNodes().get(index).getNodeID(), travelTimeAck);
+		MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(this.currentIndex).getNodeID(), travelTimeAck);
 	}
 
 	@Override
-	public void notify(ICoordinates coordinates) {		
+	public void notifyGps(ICoordinates coordinates) {		//we always check the next node. If the signal is lost, the range is too small.
+		if(this.chosenPath.getPathNodes().get(this.currentIndex+1).getCoordinates().isCloseEnough(coordinates)){
+			int time = (int) (System.currentTimeMillis()-this.timerValue);
+			try {
+				this.nearNextNode(time);
+			} catch (JSONException | IOException | TimeoutException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-
 }

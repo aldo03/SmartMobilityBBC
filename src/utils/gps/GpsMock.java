@@ -27,7 +27,7 @@ public class GpsMock extends Thread {
 		while(this.currentIndex<this.prefixedTimes.size()){
 			try {
 				Thread.sleep(this.prefixedTimes.get(currentIndex)*1000);
-				this.observer.notify(this.path.getPathNodes().get(currentIndex).getCoordinates());
+				this.observer.notifyGps(this.path.getPathNodes().get(currentIndex).getCoordinates());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
