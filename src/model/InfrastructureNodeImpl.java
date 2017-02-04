@@ -1,17 +1,17 @@
 package model;
 
+import java.util.Map;
 import java.util.Set;
 
 import model.interfaces.ICoordinates;
 import model.interfaces.IInfrastructureNodeImpl;
-import model.interfaces.IPair;
 
 public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 
 	private String nodeID;
 	private ICoordinates coordinates;
 	private Set<IInfrastructureNodeImpl> nearNodes;
-	private Set<IPair<String, Integer>> nearNodesWeighted;
+	private Map<String,Integer> nearNodesWeighted;
 
 	public InfrastructureNodeImpl(String nodeID, Set<IInfrastructureNodeImpl> nearNodes) {
 		super();
@@ -52,13 +52,13 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 	}
 
 	@Override
-	public Set<IPair<String, Integer>> getNearNodesWeighted() {
+	public Map<String,Integer> getNearNodesWeighted() {
 		return this.nearNodesWeighted;
 	}
 
 	@Override
-	public void setNearNodeWeighted(IPair<String, Integer> node) {
-		this.nearNodesWeighted.add(node);
+	public void setNearNodeWeighted(String nodeID, Integer distance) {
+		this.nearNodesWeighted.put(nodeID, distance);
 	}
 
 	@Override
@@ -72,4 +72,12 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 		return node.getNodeID().equals(obj);
 	}
 
+
+	@Override
+	public Integer getIntNodeID() {
+		String s = this.nodeID;
+		s.replaceFirst("id", "");
+		Integer idInt = Integer.parseInt(s);
+		return idInt;
+	}
 }

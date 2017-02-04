@@ -8,6 +8,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONException;
+
+import edu.asu.emit.qyan.alg.control.YenTopKShortestPathsAlg;
+import edu.asu.emit.qyan.alg.model.Graph;
+import edu.asu.emit.qyan.alg.model.Path;
+import edu.asu.emit.qyan.alg.model.Vertex;
+import edu.asu.emit.qyan.alg.model.abstracts.BaseVertex;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
@@ -17,7 +23,6 @@ import model.NodePath;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
-import model.interfaces.IPair;
 import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestPathMsg;
 import model.interfaces.msg.IResponsePathMsg;
@@ -35,13 +40,16 @@ import utils.messaging.MessagingUtils;
 public class MainServer {
 
 	private final static String USER_ID = "User-Device-";
-	private Map<String, Set<IPair<String, Integer>>> graph;
-	private Set<IInfrastructureNode> nodesSet;
+	private final static Integer K_SHORTEST_PATHS = 5;
+	private Graph graph;
+	private Set<IInfrastructureNodeImpl> nodesSet;
+	private Map<String, IInfrastructureNodeImpl> nodeMapId;
 	private int userSeed;
-	
+
 	public MainServer() throws Exception {
-		this.graph = new HashMap<>();
+		this.graph = new Graph();
 		this.nodesSet = new HashSet<>();
+		this.nodeMapId = new HashMap<>();
 		this.userSeed = 0;
 		this.initVertx();
 	}
@@ -88,7 +96,7 @@ public class MainServer {
 					n = MessagingUtils.getIntId(hnd.toString());
 					switch (n) {
 					case 1:
-						Thread t1 = new Thread(){
+						Thread t1 = new Thread() {
 							@Override
 							public void run() {
 								try {
@@ -97,12 +105,12 @@ public class MainServer {
 									e.printStackTrace();
 								}
 							}
-							
+
 						};
 						t1.start();
 						break;
 					case 2:
-						Thread t2 = new Thread(){
+						Thread t2 = new Thread() {
 							@Override
 							public void run() {
 								try {
@@ -111,55 +119,56 @@ public class MainServer {
 									e.printStackTrace();
 								}
 							}
-							
+
 						};
 						t2.start();
 						break;
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
-				} 
+				}
 			});
 			// if (req.uri().equals("/"))
 			// req.response().sendFile(path+"/ws.html");
 		}).requestHandler(router::accept).listen(8080);
 	}
 
-	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException{
+	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException {
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
-		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
-		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(),requestPathMsg.getEndingNode());
-		IResponsePathMsg responsePathMsg = new ResponsePathMsg(this.generateUserID(), MessagingUtils.RESPONSE_PATH, pathList, brokerAddress);
+		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),
+				requestPathMsg.getEndingNode());
+		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
+		IResponsePathMsg responsePathMsg = new ResponsePathMsg(this.generateUserID(), MessagingUtils.RESPONSE_PATH,
+				pathList, brokerAddress);
 		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
 		Buffer buffer = Buffer.buffer().appendString(response);
 		ws.write(buffer);
 	}
-	
-
 
 	private void handlePathAckMsg(ServerWebSocket ws, String msg) throws JSONException {
 		IPathAckMsg pathAckMsg = JSONMessagingUtils.getPathAckMsgFromString(msg);
 		List<IInfrastructureNode> pathWithCoordinates = new ArrayList<>();
 		INodePath pathFromMsg = pathAckMsg.getPath();
-		for(IInfrastructureNode node: pathFromMsg.getPathNodes()){
-			for(IInfrastructureNode n: this.nodesSet){
-				if(node.getNodeID().equals(n.getNodeID()))
+		for (IInfrastructureNode node : pathFromMsg.getPathNodes()) {
+			for (IInfrastructureNode n : this.nodesSet) {
+				if (node.getNodeID().equals(n.getNodeID()))
 					pathWithCoordinates.add(n);
 			}
 		}
 		INodePath path = new NodePath(pathWithCoordinates);
-		IPathAckMsg coordinatesMsg = new PathAckMsg(pathAckMsg.getUserID(),MessagingUtils.PATH_ACK,path,pathAckMsg.getTravelID());
+		IPathAckMsg coordinatesMsg = new PathAckMsg(pathAckMsg.getUserID(), MessagingUtils.PATH_ACK, path,
+				pathAckMsg.getTravelID());
 		String response = JSONMessagingUtils.getStringfromPathAckMsg(coordinatesMsg);
 		Buffer buffer = Buffer.buffer().appendString(response);
 		ws.write(buffer);
 	}
-	
+
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
-		//TODO generate broker address
+		// TODO generate broker address
 		return "localhost";
 	}
-	
-	private String generateUserID(){
+
+	private String generateUserID() {
 		return USER_ID + this.userSeed++;
 	}
 
@@ -171,20 +180,49 @@ public class MainServer {
 	 * @return list of shortest path
 	 */
 	public List<INodePath> getShortestPaths(IInfrastructureNode start, IInfrastructureNode finish) {
-		List<INodePath> pathList = new ArrayList<>();
-		// TODO short path algorithm
-		return pathList;
+		YenTopKShortestPathsAlg algorithm = new YenTopKShortestPathsAlg(this.graph);
+		BaseVertex startNode = new Vertex();
+		startNode.set_id(start.getIntNodeID());
+		BaseVertex endNode = new Vertex();
+		endNode.set_id(finish.getIntNodeID());
+		List<Path> paths = algorithm.get_shortest_paths(startNode, endNode, K_SHORTEST_PATHS);
+		return this.getNodePathFromPath(paths);
 	}
 
+	private List<INodePath> getNodePathFromPath(List<Path> paths){
+		List<INodePath> pathList = new ArrayList<>();
+		for(Path path: paths){
+			INodePath nodePath = new NodePath(new ArrayList<>());
+			for(BaseVertex vertex: path.get_vertices()){
+				List<IInfrastructureNode> nodeList = new ArrayList<>();
+				String id = "id"+vertex.get_id();
+				nodeList.add(this.nodeMapId.get(id));
+			}
+			pathList.add(nodePath);
+		}
+		return pathList;
+	}
+	
 	/**
 	 * method invoked to set the graph and nodeSet
 	 * 
 	 * @param nodesSet
 	 */
-	public void setNodes(Set<IInfrastructureNode> nodesSet) {
+	public void setNodes(Set<IInfrastructureNodeImpl> nodesSet) {
 		this.nodesSet = nodesSet;
-		for (IInfrastructureNode node : this.nodesSet)
-			this.graph.put(node.getNodeID(), ((IInfrastructureNodeImpl) node).getNearNodesWeighted());
+		for (IInfrastructureNodeImpl node : this.nodesSet) {
+			BaseVertex v = new Vertex();
+			v.set_id(node.getIntNodeID());
+			this.graph.add_vertex(v);
+			this.nodeMapId.put(node.getNodeID(), node);
+		}
+		for (IInfrastructureNodeImpl start : this.nodesSet) {
+			Integer idStart = start.getIntNodeID();
+			for (IInfrastructureNodeImpl end : start.getNearNodes()) {
+				Integer idEnd = end.getIntNodeID();
+				this.graph.add_edge(idStart, idEnd, start.getNearNodesWeighted().get(end.getNodeID()));
+			}
+		}
 	}
 
 	/**
@@ -194,6 +232,16 @@ public class MainServer {
 	 */
 	public void setNewNode(IInfrastructureNodeImpl node) {
 		this.nodesSet.add(node);
-		this.graph.put(node.getNodeID(), node.getNearNodesWeighted());
+		this.nodeMapId.put(node.getNodeID(), node);
+		BaseVertex v = new Vertex();
+		v.set_id(node.getIntNodeID());
+		for (IInfrastructureNodeImpl nearNode : node.getNearNodes()) {
+			Integer idNear = nearNode.getIntNodeID();
+			this.graph.add_edge(node.getIntNodeID(), idNear, node.getNearNodesWeighted().get(nearNode.getNodeID()));
+
+		}
 	}
+	
+	
+
 }

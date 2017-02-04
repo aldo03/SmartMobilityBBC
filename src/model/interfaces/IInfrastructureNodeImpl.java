@@ -1,5 +1,6 @@
 package model.interfaces;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -9,6 +10,8 @@ import java.util.Set;
  */
 public interface IInfrastructureNodeImpl extends IInfrastructureNode {
 
+
+	
 	/**
 	 * method invoked to get near nodes
 	 * @return near nodes
@@ -25,13 +28,14 @@ public interface IInfrastructureNodeImpl extends IInfrastructureNode {
 	 * method invoked to get near nodes with time of travelling 
 	 * @return weighted near nodes
 	 */
-	Set<IPair<String,Integer>> getNearNodesWeighted();
+	Map<String,Integer> getNearNodesWeighted();
 	
 	/**
 	 * method invoked to set a new node in the near nodes weighted
 	 * @param node
 	 */
-	void setNearNodeWeighted(IPair<String,Integer> node);
+	void setNearNodeWeighted(String nodeID, Integer distance);
+
 	
 	
 }

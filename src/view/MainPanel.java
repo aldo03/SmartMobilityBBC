@@ -48,7 +48,7 @@ public class MainPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.open){
-			new NodeFrame(this.nodes.getSelectedItem().toString());
+			new NodeView(this.nodes.getSelectedItem().toString());
 		}
 	}
 
