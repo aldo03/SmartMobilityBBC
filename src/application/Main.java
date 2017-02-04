@@ -68,6 +68,8 @@ public class Main {
 			System.out.println(i);
 		}
 		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
+		
+		MainView view = new MainView();
 	}
 
 }

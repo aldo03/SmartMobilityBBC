@@ -17,6 +17,7 @@ import javax.swing.table.AbstractTableModel;
 import model.InfrastructureNode;
 import model.Pair;
 import model.interfaces.IInfrastructureNode;
+import utils.mongodb.MongoDBUtils;
 
 public class NodeView extends JFrame implements WindowListener {
 
@@ -29,21 +30,24 @@ public class NodeView extends JFrame implements WindowListener {
     final static String EXPECTED_VEHICLES = "Expected vehicles";
     final static String CURRENT_TIMES = "Current Times";
     
-	public NodeView(String nodeID){
-		initGUI(this);
+    private String nodeId;
+    
+	public NodeView(String nodeId){
+		this.nodeId = nodeId;
+		initGUI();
 		this.addComponentToPane(this.getContentPane());
 	}
 	
-	private void initGUI(JFrame frame){
-		frame.setResizable(true);
+	private void initGUI(){
+		this.setResizable(true);
 		Dimension d = new Dimension(800,600);
-		frame.setMaximumSize(d);
-		frame.setSize(d);
-		frame.setTitle("Main view");
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setMaximumSize(d);
+		this.setSize(d);
+		this.setTitle("Main view");
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		//frame.setVisible(true);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setLocation((dim.width) / 2,
+		this.setLocation((dim.width) / 2,
 				(dim.height) / 2);
 	}
 	
@@ -91,9 +95,10 @@ public class NodeView extends JFrame implements WindowListener {
         expectedVehicles.put("node2",l1);
         expectedVehicles.put("node3",l2);
         p2.add(this.fillTable(expectedVehicles));
-        Map<String, List<Integer>> currentTimes = new HashMap<String, List<Integer>>();
+        /*Map<String, List<Integer>> currentTimes = new HashMap<String, List<Integer>>();
         currentTimes.put("node10", l1);
-        currentTimes.put("node20", l3);
+        currentTimes.put("node20", l3);*/
+        Map<String, List<Integer>> currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
         p3.add(this.fillTable(currentTimes));
     }
     
