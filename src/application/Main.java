@@ -32,6 +32,7 @@ public class Main {
 		device7.start();*/
 		//MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
+		
 		List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){
 			list.add(30);
@@ -66,6 +67,7 @@ public class Main {
 		for(Integer i : l){
 			System.out.println(i);
 		}
+		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
 	}
 
 }
