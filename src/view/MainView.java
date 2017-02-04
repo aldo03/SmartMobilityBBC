@@ -36,9 +36,9 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	
 	private void initPanel(){
 		this.nodes = new JComboBox<String>();
-		this.nodes.addItem("node1");
-		this.nodes.addItem("node2");
-		this.nodes.addItem("node3");
+		this.nodes.addItem("id1");
+		this.nodes.addItem("id2");
+		this.nodes.addItem("id3");
 		this.open = new JButton(" View info ");
 		this.open.addActionListener(this);
 		this.setLayout(new FlowLayout());
