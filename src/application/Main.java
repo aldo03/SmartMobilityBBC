@@ -27,9 +27,9 @@ public class Main {
 		device5.start();
 		device6.start();
 		device7.start();*/
-		//MainView view = new MainView();
+		MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
-		List<Integer> list = new ArrayList<>();
+		/*List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){
 			list.add(30);
 		}
@@ -39,7 +39,7 @@ public class Main {
 		MongoDBUtils.initTravelTimes("id1", "id3", list);
 		MongoDBUtils.setTravelTime("id1", "id2", 30, 40);
 		MongoDBUtils.initTravelTimes("id2", "id3", list);
-		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
+		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);*/
 	}
 
 }
