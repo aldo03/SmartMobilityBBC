@@ -1,5 +1,7 @@
 package utils.mongodb;
 
+import java.util.List;
+
 import org.bson.BSONObject;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
@@ -29,7 +31,7 @@ public class MongoDBUtils {
 		mongoClient.close();
 	}
 	
-	public static void intTimes(String nodeId){
+	public static void initTimes(String nodeId){
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		db.getCollection(nodeId).dropIndexes();
@@ -37,7 +39,7 @@ public class MongoDBUtils {
 		mongoClient.close();
 	}
 	
-	public static void intExpectedVehicles(String nodeId) {
+	public static void initExpectedVehicles(String nodeId) {
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		db.getCollection(nodeId).dropIndexes();
@@ -45,12 +47,12 @@ public class MongoDBUtils {
 		mongoClient.close();
 	}
 	
-	public static void initTravelTimes(String nodeId, String nodeId2, int[] array){
+	public static void initTravelTimes(String nodeId, String nodeId2, List<Integer> list){
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		Document doc = new Document("_id", nodeId2)
-                .append("times", array);
+                .append("times", list);
 		collection.insertOne(doc);
 		mongoClient.close();
 	}

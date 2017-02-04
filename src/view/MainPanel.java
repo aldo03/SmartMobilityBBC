@@ -51,6 +51,7 @@ public class MainPanel extends JPanel implements ActionListener {
 			System.out.println("aaa");
 			NodeView nv = new NodeView(this.nodes.getSelectedItem().toString());
 			nv.setVisible(true);
+			new NodeView(this.nodes.getSelectedItem().toString());
 		}
 	}
 
