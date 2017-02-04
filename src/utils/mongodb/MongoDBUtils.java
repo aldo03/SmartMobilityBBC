@@ -154,4 +154,40 @@ public class MongoDBUtils {
 		mongoClient.close();
 		return curTimes;
 	}
+	
+	public static Map<String, List<Integer>> getExpectedVehicles(String nodeId){
+		Map<String, List<Integer>> curTimes = new HashMap<>();
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		FindIterable<Document> iterable = collection.find();
+		MongoCursor<Document> cursor = iterable.iterator();
+		while(cursor.hasNext()){
+			Document d = cursor.next();
+			String id = d.getString("_id");
+			System.out.println(id);
+			List<Integer> list = (List<Integer>) d.get("vehicles");
+			curTimes.put(id, list);
+		}
+		mongoClient.close();
+		return curTimes;
+	}
+	
+	public static Map<String, List<Integer>> getTimeTravels(String nodeId){
+		Map<String, List<Integer>> curTimes = new HashMap<>();
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		FindIterable<Document> iterable = collection.find();
+		MongoCursor<Document> cursor = iterable.iterator();
+		while(cursor.hasNext()){
+			Document d = cursor.next();
+			String id = d.getString("_id");
+			System.out.println(id);
+			List<Integer> list = (List<Integer>) d.get("times");
+			curTimes.put(id, list);
+		}
+		mongoClient.close();
+		return curTimes;
+	}
 }
