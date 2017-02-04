@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,6 @@ public class NodeView extends JFrame implements WindowListener {
 	
     public void addComponentToPane(Container pane) {
         JTabbedPane tabbedPane = new JTabbedPane();
-
         //Create the "cards".
         JPanel card1 = new JPanel() {
             //Make the panel wider than it really needs, so
@@ -60,28 +60,45 @@ public class NodeView extends JFrame implements WindowListener {
                 return size;
             }
         };
-        
-        
-        List<InfrastructureNode> neighbors = new ArrayList<InfrastructureNode>();
-        neighbors.add(new InfrastructureNode("Node2"));
-        neighbors.add(new InfrastructureNode("Node3"));
-        neighbors.add(new InfrastructureNode("Node4"));
-        card1.add(this.addTravelTimesTable(neighbors));
-        
-        JPanel card2 = new JPanel();
-        //card2.add(this.addExpectedVehiclesTable(tableContent));
-        
-        JPanel card3 = new JPanel();
-        //card3.add(this.addCurrentTimesTable(tableContent))
+        JPanel card2 = new JPanel();        
+        JPanel card3 = new JPanel(); 
+        testTables(card1,card2,card3);
         tabbedPane.addTab(TRAVEL_TIMES, card1);
         tabbedPane.addTab(EXPECTED_VEHICLES, card2);
         tabbedPane.addTab(CURRENT_TIMES,card3);
-
         pane.add(tabbedPane, BorderLayout.CENTER);
     }
     
+    private void testTables(JPanel p1, JPanel p2, JPanel p3){
+    	Map<String, List<Integer>> neighbors = new HashMap<String, List<Integer>>();
+        List<Integer> l1 = new ArrayList<Integer>();
+        l1.add(1);
+        l1.add(2);
+        l1.add(3);
+        List<Integer> l2 = new ArrayList<Integer>();
+        l2.add(4);
+        l2.add(5);
+        l2.add(6);
+        List<Integer> l3 = new ArrayList<Integer>();
+        l3.add(7);
+        l3.add(8);
+        l3.add(9);
+        neighbors.put("node2", l1);
+        neighbors.put("node3", l2);
+        neighbors.put("node4", l3);       
+        p1.add(this.addTravelTimesTable(neighbors));
+        Map<String, List<Integer>> expectedVehicles = new HashMap<String, List<Integer>>();
+        expectedVehicles.put("node2",l1);
+        expectedVehicles.put("node3",l2);
+        p2.add(this.fillTable(expectedVehicles));
+        Map<String, List<Integer>> currentTimes = new HashMap<String, List<Integer>>();
+        currentTimes.put("node10", l1);
+        currentTimes.put("node20", l3);
+        p3.add(this.fillTable(currentTimes));
+    }
     
-    private JScrollPane addTravelTimesTable(List<InfrastructureNode> neighbors){
+    
+    private JScrollPane addTravelTimesTable(Map<String, List<Integer>> neighbors){
     	JTable table = new JTable(neighbors.size(), 201);
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
@@ -90,46 +107,40 @@ public class NodeView extends JFrame implements WindowListener {
     		table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range+"/"+(range+5));
     		range+=5;
     	}
-    	for(int j = 0; j < table.getRowCount(); j++){
-    		table.setValueAt(neighbors.get(j).getNodeID(), j, 0);
+    	int j = 0;
+    	for(String s : neighbors.keySet()){
+    		table.setValueAt(s, j, 0);        		
+        		for(int k = 1; k < neighbors.get(s).size() + 1 ; k++){
+        			table.setValueAt(neighbors.get(s).get(k-1), j, k);
+        		}
+        	j++;
     	}
+    	
     	JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    	
-    	scrollPane.repaint();
-    	
+    	scrollPane.repaint();    	
     	return scrollPane;
     }
     
-    private JScrollPane addExpectedVehiclesTable(Map<String, List<Integer>> tableContent){
-    	JTable table = new JTable();
+    private JScrollPane fillTable(Map<String, List<Integer>> tableContent){
+    	int max = 0;
+    	for (String l : tableContent.keySet()){
+    		if(tableContent.get(l).size() > max)
+    			max = tableContent.get(l).size()+1;
+    	}
+    	JTable table = new JTable(tableContent.keySet().size(), max);
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    	/*for(Pair<String, String[]> s : tableContent){
-    		for(int i = 0; i < tableContent.size(); i++){
-    			
-    		}
-    	}*/
+    	int j = 0;
+    	for(String s : tableContent.keySet()){
+    		table.setValueAt(s, j, 0);        		
+        		for(int k = 1; k < tableContent.get(s).size() + 1; k++){
+        			table.setValueAt(tableContent.get(s).get(k-1), j, k);
+        		}
+        	j++;
+    	} 	
     	JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.repaint();
     	return scrollPane;
     }
-    
-    private JScrollPane addCurrentTimesTable(Map<String, List<Integer>> tableContent){
-    	JTable table = new JTable();
-    	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    	/*
-    	for(Map<String, List<Integer>> s : tableContent){
-    		for(int i = 0; i < tableContent.size(); i++){
-    			
-    		}
-    	}
-    	*/
-    	JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.repaint();
-    	return scrollPane;
-    }
-
-    
-    
     
 	@Override
 	public void windowOpened(WindowEvent e) {
