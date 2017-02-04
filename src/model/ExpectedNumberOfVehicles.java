@@ -18,7 +18,7 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 	public ExpectedNumberOfVehicles(String nodeId){
 		this.vehicles = new HashMap<>();
 		this.nodeId = nodeId;
-		MongoDBUtils.intExpectedVehicles(nodeId);
+		MongoDBUtils.initExpectedVehicles(nodeId);
 	}
 	
 	
