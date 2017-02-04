@@ -65,7 +65,8 @@ public class NodeView extends JFrame implements WindowListener {
             }
         };
         JPanel card2 = new JPanel();        
-        JPanel card3 = new JPanel(); 
+        JPanel card3 = new JPanel();
+        
         testTables(card1,card2,card3);
         tabbedPane.addTab(TRAVEL_TIMES, card1);
         tabbedPane.addTab(EXPECTED_VEHICLES, card2);
@@ -90,28 +91,24 @@ public class NodeView extends JFrame implements WindowListener {
         neighbors.put("node2", l1);
         neighbors.put("node3", l2);
         neighbors.put("node4", l3);       
-        p1.add(this.addTravelTimesTable(neighbors));
+        p1.add(this.fillTable(neighbors, false));
         Map<String, List<Integer>> expectedVehicles = new HashMap<String, List<Integer>>();
         expectedVehicles.put("node2",l1);
         expectedVehicles.put("node3",l2);
-        p2.add(this.fillTable(expectedVehicles));
+        p2.add(this.fillTable(expectedVehicles, false));
         /*Map<String, List<Integer>> currentTimes = new HashMap<String, List<Integer>>();
         currentTimes.put("node10", l1);
         currentTimes.put("node20", l3);*/
         Map<String, List<Integer>> currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
-        p3.add(this.fillTable(currentTimes));
+        p3.add(this.fillTable(currentTimes, true));
     }
     
-    
-    private JScrollPane addTravelTimesTable(Map<String, List<Integer>> neighbors){
+  /*  
+    private JScrollPane addTravelTimesTable(Map<String, List<Integer>> neighbors, boolean travelTimes){
     	JTable table = new JTable(neighbors.size(), 201);
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
-    	int range = 5;
-    	for(int i = 1; i < table.getColumnCount(); i++){
-    		table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range+"/"+(range+5));
-    		range+=5;
-    	}
+    	
     	int j = 0;
     	for(String s : neighbors.keySet()){
     		table.setValueAt(s, j, 0);        		
@@ -125,8 +122,8 @@ public class NodeView extends JFrame implements WindowListener {
     	scrollPane.repaint();    	
     	return scrollPane;
     }
-    
-    private JScrollPane fillTable(Map<String, List<Integer>> tableContent){
+    */
+    private JScrollPane fillTable(Map<String, List<Integer>> tableContent, boolean travelTimes){
     	int max = 0;
     	for (String l : tableContent.keySet()){
     		if(tableContent.get(l).size() > max)
@@ -134,6 +131,13 @@ public class NodeView extends JFrame implements WindowListener {
     	}
     	JTable table = new JTable(tableContent.keySet().size(), max);
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    	if(travelTimes){
+			int range = 5;
+			for (int i = 1; i < table.getColumnCount(); i++) {
+				table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range + "/" + (range + 5));
+				range += 5;
+			}
+    	}	
     	int j = 0;
     	for(String s : tableContent.keySet()){
     		table.setValueAt(s, j, 0);        		
