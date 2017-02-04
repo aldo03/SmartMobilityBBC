@@ -75,7 +75,7 @@ public class NodeView extends JFrame implements WindowListener {
     }
     
     private void testTables(JPanel p1, JPanel p2, JPanel p3){
-    	Map<String, List<Integer>> neighbors = new HashMap<String, List<Integer>>();
+    	/*Map<String, List<Integer>> neighbors = new HashMap<String, List<Integer>>();
         List<Integer> l1 = new ArrayList<Integer>();
         l1.add(1);
         l1.add(2);
@@ -90,17 +90,19 @@ public class NodeView extends JFrame implements WindowListener {
         l3.add(9);
         neighbors.put("node2", l1);
         neighbors.put("node3", l2);
-        neighbors.put("node4", l3);       
-        p1.add(this.fillTable(neighbors, false));
-        Map<String, List<Integer>> expectedVehicles = new HashMap<String, List<Integer>>();
+        neighbors.put("node4", l3);   */
+    	Map<String, List<Integer>> neighbors = MongoDBUtils.getTimeTravels(this.nodeId);
+        p1.add(this.fillTable(neighbors, true));
+        /*Map<String, List<Integer>> expectedVehicles = new HashMap<String, List<Integer>>();
         expectedVehicles.put("node2",l1);
-        expectedVehicles.put("node3",l2);
+        expectedVehicles.put("node3",l2);*/
+        Map<String, List<Integer>> expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
         p2.add(this.fillTable(expectedVehicles, false));
         /*Map<String, List<Integer>> currentTimes = new HashMap<String, List<Integer>>();
         currentTimes.put("node10", l1);
         currentTimes.put("node20", l3);*/
         Map<String, List<Integer>> currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
-        p3.add(this.fillTable(currentTimes, true));
+        p3.add(this.fillTable(currentTimes, false));
     }
     
   /*  
@@ -132,7 +134,7 @@ public class NodeView extends JFrame implements WindowListener {
     	JTable table = new JTable(tableContent.keySet().size(), max);
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     	if(travelTimes){
-			int range = 5;
+			int range = 0;
 			for (int i = 1; i < table.getColumnCount(); i++) {
 				table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range + "/" + (range + 5));
 				range += 5;
