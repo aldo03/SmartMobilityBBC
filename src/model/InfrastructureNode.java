@@ -12,6 +12,15 @@ public class InfrastructureNode implements IInfrastructureNode {
 		this.id = id;
 	}
 
+
+	@Override
+	public Integer getIntNodeID() {
+		String s = this.id;
+		s.replaceFirst("id", "");
+		Integer idInt = Integer.parseInt(s);
+		return idInt;
+	}
+	
 	@Override
 	public String getNodeID() {
 		return this.id;

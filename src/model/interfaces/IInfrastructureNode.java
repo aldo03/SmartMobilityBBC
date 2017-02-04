@@ -12,6 +12,12 @@ public interface IInfrastructureNode {
 	String getNodeID();
 	
 	/**
+	 * method invoked to get the id as a number
+	 * @return node id in integer form
+	 */
+	Integer getIntNodeID();
+	
+	/**
 	 * gets the coordinates of the node
 	 * @return the node coordinates
 	 */
