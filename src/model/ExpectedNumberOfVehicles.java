@@ -18,7 +18,7 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 	public ExpectedNumberOfVehicles(String nodeId){
 		this.vehicles = new HashMap<>();
 		this.nodeId = nodeId;
-		MongoDBUtils.intExpectedVehicles(nodeId);
+		MongoDBUtils.initExpectedVehicles(nodeId);
 	}
 	
 	
@@ -46,6 +46,7 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 		List<Integer> listOfVehicles = this.vehicles.get(nodeId);
 		int currentTimeSeconds = (int) (System.currentTimeMillis()/1000);
 		listOfVehicles.add((int) (currentTimeSeconds+time));
+		MongoDBUtils.addExpectedVehicle(this.nodeId, nodeId, (int) (currentTimeSeconds+time));
 		Collections.sort(listOfVehicles);
 		for(Integer i : listOfVehicles){       //every "non fresh" information is removed
 			if(i<currentTimeSeconds){
@@ -59,6 +60,6 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 	@Override
 	public void initVehicles(String nodeId) {
 		this.vehicles.put(nodeId, new ArrayList<>());
+		MongoDBUtils.initExpectedVehicles(this.nodeId, nodeId);
 	}
-
 }
