@@ -22,6 +22,7 @@ public class CurrentTimes implements ICurrentTimes {
 	@Override
 	public void addTime(String nodeId, int time) {
 		this.currentTimes.get(nodeId).add(time);
+		MongoDBUtils.addCurrentTime(this.nodeId, nodeId, time);
 	}
 
 	
@@ -40,6 +41,7 @@ public class CurrentTimes implements ICurrentTimes {
 	@Override
 	public void initTimes(String nodeId) {
 		this.currentTimes.put(nodeId, new ArrayList<>());
+		MongoDBUtils.initCurrentTime(this.nodeId, nodeId);
 	}
 
 	@Override
@@ -47,6 +49,7 @@ public class CurrentTimes implements ICurrentTimes {
 		for(List<Integer> l : this.currentTimes.values()){
 			l.clear();
 		}
+		MongoDBUtils.clearCurrentTimes(this.nodeId, this.currentTimes.keySet());
 	}
 
 	@Override

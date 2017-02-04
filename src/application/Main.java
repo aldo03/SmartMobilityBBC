@@ -1,7 +1,10 @@
 package application;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import server.MainServer;
 import user.UserDevice;
@@ -40,6 +43,29 @@ public class Main {
 		MongoDBUtils.setTravelTime("id1", "id2", 30, 40);
 		MongoDBUtils.initTravelTimes("id2", "id3", list);
 		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
+		MongoDBUtils.initCurrentTime("id1");
+		MongoDBUtils.initCurrentTime("id1", "id2");
+		MongoDBUtils.addCurrentTime("id1", "id2", 18);
+		MongoDBUtils.addCurrentTime("id1", "id2", 19);
+		MongoDBUtils.addCurrentTime("id1", "id2", 20);
+		Set<String> set = new HashSet<>();
+		set.add("id2");
+		//MongoDBUtils.clearCurrentTimes("id1", set);
+		//MongoDBUtils.addCurrentTime("id1", "id2", 20);
+		MongoDBUtils.initExpectedVehicles("id1");
+		MongoDBUtils.initExpectedVehicles("id1", "id2");
+		MongoDBUtils.initExpectedVehicles("id1", "id3");
+		MongoDBUtils.addExpectedVehicle("id1", "id2", 30);
+		MongoDBUtils.addExpectedVehicle("id1", "id2", 40);
+		MongoDBUtils.addExpectedVehicle("id1", "id3", 50);
+		MongoDBUtils.removeExpectedVehicles("id1", "id2", 35);
+		MongoDBUtils.addExpectedVehicle("id1", "id2", 40);
+		MongoDBUtils.removeExpectedVehicles("id1", "id2", 41);
+		Map<String, List<Integer>> m = MongoDBUtils.getCurrentTimes("id1");
+		List<Integer>l = m.get("id2");
+		for(Integer i : l){
+			System.out.println(i);
+		}
 	}
 
 }
