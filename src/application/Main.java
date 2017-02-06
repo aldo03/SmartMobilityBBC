@@ -34,7 +34,6 @@ public class Main {
 		//MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
 		
-		String s = "s";
 		List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){
 			list.add(30);
@@ -43,7 +42,8 @@ public class Main {
 		MongoDBUtils.initTimes("id2");
 		MongoDBUtils.initTempHum("id1", 25.6, 33.4);
 		MongoDBUtils.initTempHum("id2", 25.8, 33.2);
-		MongoDBUtils.setTempHum("id1", 25.7, 25.8);
+		MongoDBUtils.setTemp("id1", 25.7);
+		MongoDBUtils.setHum("id1", 35.7);
 		MongoDBUtils.initTravelTimes("id1", "id2", list);
 		MongoDBUtils.initTravelTimes("id1", "id3", list);
 		MongoDBUtils.setTravelTime("id1", "id2", 30, 40);

@@ -39,9 +39,13 @@ import model.msg.ResponseTravelTimeMsg;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
+import utils.mongodb.MongoDBUtils;
 
 public class InfrastructureDevice extends Thread implements ITemperatureHumidityObserver{
 	private static final int TEMP_THRESHOLD = 3;
+	private static final int HUM_THRESHOLD = 30;
+	private static final double DEF_TEMP = 25;
+	private static final double DEF_HUM = 50;
 	
 	private String id;
 	private Set<IPair<String, Integer>> nearNodesWeighted;
@@ -59,10 +63,6 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.nearNodesWeighted = nearNodesWeighted;
 		this.brokerHost = brokerHost;
 		this.initializeDataStructures();
-		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensor();
-		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
-		sensorThread.attachObserver(this);
-		sensorThread.start();
 	}
 	
 	private void initializeDataStructures(){
@@ -75,6 +75,13 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 			this.expectedVehicles.initVehicles(p.getFirst());
 			this.curTimes.initTimes(p.getFirst());
 		}
+		this.currentTemperature = DEF_TEMP;
+		this.currentHumidity = DEF_HUM;
+		MongoDBUtils.initTempHum(this.id, this.currentTemperature, this.currentHumidity);
+		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensorMock();
+		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
+		sensorThread.attachObserver(this);
+		sensorThread.start();
 		UpdateTravelTimesThread thread = new UpdateTravelTimesThread(this.curTimes, this.travelTimes);
 		thread.start();
 	}
@@ -157,7 +164,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 			//the user is added to the pending users
 			this.pendingUsers.addPendingUser(msg.getUserID(), msg.getTravelID(), totalTime);
 			boolean frozenDanger = msg.frozenDanger();
-			if(this.currentTemperature<TEMP_THRESHOLD){
+			if(this.currentTemperature<TEMP_THRESHOLD&&this.currentHumidity>HUM_THRESHOLD){
 				frozenDanger = true;
 			}
 			IRequestTravelTimeMsg msgToSend = new RequestTravelTimeMsg(msg.getUserID(),
@@ -188,11 +195,13 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 	@Override
 	public void setTemperature(double temperature) {
 		this.currentTemperature = temperature;
+		MongoDBUtils.setTemp(this.id, temperature);
 	}
 
 	@Override
 	public void setHumidity(double humidity) {
 		this.currentHumidity = humidity;
+		MongoDBUtils.setHum(this.id, humidity);
 	}
 
 

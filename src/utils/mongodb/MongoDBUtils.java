@@ -93,13 +93,22 @@ public class MongoDBUtils {
 		mongoClient.close();
 	}
 	
-	public static void setTempHum(String nodeId, double temp, double hum){
+	public static void setTemp(String nodeId, double temp){
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument();
-		BsonDocument updateCommand = new BsonDocument("$set", new BsonDocument("temp", new BsonDouble(temp)).
-				append("hum", new BsonDouble(hum)));
+		BsonDocument updateCommand = new BsonDocument("$set", new BsonDocument("temp", new BsonDouble(temp)));
+		collection.updateOne(updateQuery, updateCommand);
+		mongoClient.close();
+	}
+	
+	public static void setHum(String nodeId, double hum){
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		BsonDocument updateQuery  = new BsonDocument();
+		BsonDocument updateCommand = new BsonDocument("$set", new BsonDocument("hum", new BsonDouble(hum)));
 		collection.updateOne(updateQuery, updateCommand);
 		mongoClient.close();
 	}
