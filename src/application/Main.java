@@ -32,6 +32,7 @@ public class Main {
 		device7.start();*/
 		//MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
+		
 		String s = "s";
 		List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){

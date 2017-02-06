@@ -41,6 +41,8 @@ import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
 public class InfrastructureDevice extends Thread{
+	private static final int TEMP_THRESHOLD = 3;
+	
 	private String id;
 	private Set<IPair<String, Integer>> nearNodesWeighted;
 	private String brokerHost;
@@ -49,6 +51,8 @@ public class InfrastructureDevice extends Thread{
 	private IExpectedNumberOfVehicles expectedVehicles;
 	private IPendingUsers pendingUsers;
 	private ICurrentTimes curTimes;
+	private float currentTemperature;
+	private float currentHumidity;
 	
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
@@ -148,13 +152,17 @@ public class InfrastructureDevice extends Thread{
 			int totalTime = msg.getCurrentTravelTime() + getTravelTime(nextNode, msg.getCurrentTravelTime());
 			//the user is added to the pending users
 			this.pendingUsers.addPendingUser(msg.getUserID(), msg.getTravelID(), totalTime);
+			boolean frozenDanger = msg.frozenDanger();
+			if(this.currentTemperature<TEMP_THRESHOLD){
+				frozenDanger = true;
+			}
 			IRequestTravelTimeMsg msgToSend = new RequestTravelTimeMsg(msg.getUserID(),
 					MessagingUtils.REQUEST_TRAVEL_TIME, totalTime, path,
-					msg.getTravelID());
+					msg.getTravelID(), frozenDanger);
 			String strToSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(msgToSend);
 			MomUtils.sendMsg(factory, nextNode.getNodeID(), strToSend);
 		} else { 								//This is the last node of the path
-			IResponseTravelTimeMsg m = new ResponseTravelTimeMsg(MessagingUtils.RESPONSE_TRAVEL_TIME, msg.getCurrentTravelTime(), msg.getTravelID());
+			IResponseTravelTimeMsg m = new ResponseTravelTimeMsg(MessagingUtils.RESPONSE_TRAVEL_TIME, msg.getCurrentTravelTime(), msg.getTravelID(), msg.frozenDanger());
 			String sToSend = JSONMessagingUtils.getStringfromResponseTravelTimeMsg(m);
 			MomUtils.sendMsg(factory, msg.getUserID(), sToSend);
 		}
