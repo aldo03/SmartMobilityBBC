@@ -32,6 +32,7 @@ dependencies {
     compile fileTree(dir: '/lib', include: 'amqp-client-3.6.5.jar')
     compile fileTree(dir: '/lib', include: 'yan-k-shortest-path.jar')
 	compile 'org.mongodb:mongodb-driver:3.4.2'
+	compile 'com.pi4j:pi4j-example:1.1'
 
 
     // The production code uses the SLF4J logging API at compile time
