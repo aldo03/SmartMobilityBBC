@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import model.interfaces.IPair;
 import server.MainServer;
 import user.UserDevice;
 import utils.mongodb.MongoDBUtils;
@@ -40,6 +41,9 @@ public class Main {
 		}
 		MongoDBUtils.initTimes("id1");
 		MongoDBUtils.initTimes("id2");
+		MongoDBUtils.initTempHum("id1", 25.6, 33.4);
+		MongoDBUtils.initTempHum("id2", 25.8, 33.2);
+		MongoDBUtils.setTempHum("id1", 25.7, 25.8);
 		MongoDBUtils.initTravelTimes("id1", "id2", list);
 		MongoDBUtils.initTravelTimes("id1", "id3", list);
 		MongoDBUtils.setTravelTime("id1", "id2", 30, 40);
@@ -69,7 +73,9 @@ public class Main {
 			System.out.println(i);
 		}
 		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
-		
+		IPair<Double, Double> temp = MongoDBUtils.getTempHum("id1");
+		System.out.println(temp.getFirst());
+		System.out.println(temp.getSecond());
 		MainView view = new MainView();
 	}
 

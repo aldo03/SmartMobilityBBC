@@ -8,7 +8,9 @@ import java.util.Set;
 
 import org.bson.BSONObject;
 import org.bson.BsonArray;
+import org.bson.BsonDecimal128;
 import org.bson.BsonDocument;
+import org.bson.BsonDouble;
 import org.bson.BsonInt32;
 import org.bson.BsonString;
 import org.bson.BsonValue;
@@ -26,10 +28,14 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
 
+import model.Pair;
+import model.interfaces.IPair;
+
 public class MongoDBUtils {
 	private static final String DB_TIME_TRAVELS = "timetravelsdb";
 	private static final String DB_EXPECTED_VEHICLES = "expectedvehiclesdb";
 	private static final String DB_CURRENT_TIMES = "currenttimesdb";
+	private static final String DB_TEMPHUM = "temphum";
 	
 	public static void initCurrentTime(String nodeId){
 		MongoClient mongoClient = new MongoClient( "localhost" );
@@ -55,6 +61,18 @@ public class MongoDBUtils {
 		mongoClient.close();
 	}
 	
+	public static void initTempHum(String nodeId, double temp, double hum){
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		collection.dropIndexes();
+		collection.drop();
+		Document doc = new Document("temp", temp)
+                .append("hum", hum);	
+		collection.insertOne(doc);
+		mongoClient.close();
+	}
+	
 	public static void initTravelTimes(String nodeId, String nodeId2, List<Integer> list){
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
@@ -71,6 +89,17 @@ public class MongoDBUtils {
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument().append("_id", new BsonString(nodeId2));
 		BsonDocument updateCommand = new BsonDocument("$set", new BsonDocument("times."+index, new BsonInt32(travelTime)));
+		collection.updateOne(updateQuery, updateCommand);
+		mongoClient.close();
+	}
+	
+	public static void setTempHum(String nodeId, double temp, double hum){
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		BsonDocument updateQuery  = new BsonDocument();
+		BsonDocument updateCommand = new BsonDocument("$set", new BsonDocument("temp", new BsonDouble(temp)).
+				append("hum", new BsonDouble(hum)));
 		collection.updateOne(updateQuery, updateCommand);
 		mongoClient.close();
 	}
@@ -189,5 +218,17 @@ public class MongoDBUtils {
 		}
 		mongoClient.close();
 		return curTimes;
+	}
+	
+	public static IPair<Double, Double> getTempHum(String nodeId){
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
+		MongoCollection<Document> collection = db.getCollection(nodeId);
+		FindIterable<Document> iterable = collection.find();
+		Document d = iterable.first();
+		double temp = d.getDouble("temp");
+		double hum = d.getDouble("hum");
+		mongoClient.close();
+		return new Pair<Double, Double>(temp, hum);
 	}
 }
