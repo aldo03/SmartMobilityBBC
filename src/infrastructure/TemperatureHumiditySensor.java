@@ -3,11 +3,15 @@ package infrastructure;
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioUtil;
 
-public class TemperatureHumiditySensor {
+import model.interfaces.ITemperatureHumiditySensor;
+
+public class TemperatureHumiditySensor implements ITemperatureHumiditySensor{
 
 	private static final int MAXTIMINGS = 85;
 	private int[] dht11_dat = { 0, 0, 0, 0, 0 };
-
+	private double temperature;
+	private double humidity;
+	
 	public TemperatureHumiditySensor() {
 
 	    // setup wiringPi
@@ -16,10 +20,13 @@ public class TemperatureHumiditySensor {
 	        return;
 	    }
 
-	   GpioUtil.export(3, GpioUtil.DIRECTION_OUT);            
+	   GpioUtil.export(3, GpioUtil.DIRECTION_OUT);      
+	   this.temperature = 0;
+	   this.humidity = 0;
 	}
 
-	public void getTemperature() {
+	@Override
+	public void senseTemperatureAndHumidity() {
 	   int laststate = Gpio.HIGH;
 	   int j = 0;
 	   dht11_dat[0] = dht11_dat[1] = dht11_dat[2] = dht11_dat[3] = dht11_dat[4] = 0;
@@ -76,6 +83,8 @@ public class TemperatureHumiditySensor {
 	        }
 	        float f = c * 1.8f + 32;
 	        System.out.println( "Humidity = " + h + " Temperature = " + c + "(" + f + "f)");
+	        this.temperature = c;
+	        this.humidity = h;
 	    }else  {
 	        System.out.println( "Data not good, skip" );
 	    }
@@ -86,19 +95,14 @@ public class TemperatureHumiditySensor {
 	  return (dht11_dat[4] == ((dht11_dat[0] + dht11_dat[1] + dht11_dat[2] + dht11_dat[3]) & 0xFF));
 	}
 
-
-
-	public static void main (String ars[]) throws Exception {
-
-		TemperatureHumiditySensor dht = new TemperatureHumiditySensor();
-
-	    for (int i=0; i<10; i++) {
-	       Thread.sleep(2000);
-	       dht.getTemperature();
-	    }
-
-	    System.out.println("Done!!");
-
+	@Override
+	public double getTemperature(){
+		return this.temperature;
+	}
+	
+	@Override
+	public double getHumidity(){
+		return this.humidity;
 	}
 	
 }
