@@ -20,14 +20,14 @@ import model.ExpectedNumberOfVehicles;
 import model.PendingUsers;
 import model.TravelTimesByNumberOfVehicles;
 import model.UpdateTravelTimesThread;
-import model.interfaces.ICoordinates;
 import model.interfaces.ICurrentTimes;
 import model.interfaces.IExpectedNumberOfVehicles;
-import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
 import model.interfaces.IPendingUsers;
+import model.interfaces.ITemperatureHumidityObserver;
+import model.interfaces.ITemperatureHumiditySensor;
 import model.interfaces.ITravelTimesByNumberOfVehicles;
 import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;
@@ -40,7 +40,7 @@ import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
 
-public class InfrastructureDevice extends Thread{
+public class InfrastructureDevice extends Thread implements ITemperatureHumidityObserver{
 	private static final int TEMP_THRESHOLD = 3;
 	
 	private String id;
@@ -51,14 +51,18 @@ public class InfrastructureDevice extends Thread{
 	private IExpectedNumberOfVehicles expectedVehicles;
 	private IPendingUsers pendingUsers;
 	private ICurrentTimes curTimes;
-	private float currentTemperature;
-	private float currentHumidity;
+	private double currentTemperature;
+	private double currentHumidity;
 	
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
 		this.brokerHost = brokerHost;
 		this.initializeDataStructures();
+		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensor();
+		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
+		sensorThread.attachObserver(this);
+		sensorThread.start();
 	}
 	
 	private void initializeDataStructures(){
@@ -179,6 +183,16 @@ public class InfrastructureDevice extends Thread{
 		int numOfVehiclesExpected = this.expectedVehicles.getVehicles(node.getNodeID(), time);
 		int travelTime = this.travelTimes.getTravelTime(node.getNodeID(), numOfVehiclesExpected);
 		return travelTime;
+	}
+
+	@Override
+	public void setTemperature(double temperature) {
+		this.currentTemperature = temperature;
+	}
+
+	@Override
+	public void setHumidity(double humidity) {
+		this.currentHumidity = humidity;
 	}
 
 
