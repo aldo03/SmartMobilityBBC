@@ -10,14 +10,16 @@ public class RequestTravelTimeMsg implements IRequestTravelTimeMsg {
 	private int currentTravelTime;
 	private INodePath path;
 	private int travelId;
+	private boolean frozen;
 	
 	public RequestTravelTimeMsg(String userId, String msgId, int currentTravelTime,
-			INodePath path, int travelId){
+			INodePath path, int travelId, boolean frozen){
 		this.userId = userId;
 		this.msgId = msgId;
 		this.currentTravelTime = currentTravelTime;
 		this.path = path;
 		this.travelId = travelId;
+		this.frozen = true;
 	}
 
 	@Override
@@ -43,6 +45,11 @@ public class RequestTravelTimeMsg implements IRequestTravelTimeMsg {
 	@Override
 	public int getTravelID() {
 		return this.travelId;
+	}
+
+	@Override
+	public boolean frozenDanger() {
+		return this.frozen;
 	}
 
 }

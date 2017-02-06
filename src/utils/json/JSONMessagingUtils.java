@@ -34,6 +34,7 @@ public class JSONMessagingUtils {
 	private static final String TRAVEL_TIME = "traveltime";
 	private static final String TRAVEL_ID = "travelid";
 	private static final String BROKER_ADDR = "brokeraddress";
+	private static final String IS_FROZEN = "isfrozen";
 	
 	public static String getStringfromPathAckMsg(IPathAckMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
@@ -80,6 +81,7 @@ public class JSONMessagingUtils {
 		obj.put(TRAVEL_ID, msg.getTravelID());
 		obj.put(TRAVEL_TIME, msg.getCurrentTravelTime());
 		obj.put(PATH, msg.getPath());
+		obj.put(IS_FROZEN, msg.frozenDanger());
 		return obj.toString();	
 	}
 	
@@ -88,6 +90,7 @@ public class JSONMessagingUtils {
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(TRAVEL_ID, msg.getTravelID());
 		obj.put(TRAVEL_TIME, msg.getTravelTime());
+		obj.put(IS_FROZEN, msg.frozenDanger());
 		return obj.toString();	
 	}
 	
@@ -146,13 +149,14 @@ public class JSONMessagingUtils {
 		JSONObject obj = new JSONObject(s);
 		INodePath path = JSONNodePath.getNodePathfromJSONArray(obj.getJSONArray(PATH));
 		IRequestTravelTimeMsg msg =new RequestTravelTimeMsg(obj.getString(USER_ID), obj.getString(MSG_ID),
-				obj.getInt(TRAVEL_TIME),path, obj.getInt(TRAVEL_ID));
+				obj.getInt(TRAVEL_TIME),path, obj.getInt(TRAVEL_ID), obj.getBoolean(IS_FROZEN));
 		return msg;
 	}
 	
 	public static IResponseTravelTimeMsg getResponseTravelTimeMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
-		IResponseTravelTimeMsg msg = new ResponseTravelTimeMsg(obj.getString(MSG_ID),obj.getInt(TRAVEL_TIME), obj.getInt(TRAVEL_ID));
+		IResponseTravelTimeMsg msg = new ResponseTravelTimeMsg(obj.getString(MSG_ID),obj.getInt(TRAVEL_TIME), obj.getInt(TRAVEL_ID),
+											obj.getBoolean(IS_FROZEN));
 		return msg;
 	}
 	
