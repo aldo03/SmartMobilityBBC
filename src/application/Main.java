@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import model.InfrastructureNodeImpl;
+import model.interfaces.IInfrastructureNodeImpl;
 import server.MainServer;
 import user.UserDevice;
 import utils.mongodb.MongoDBUtils;
@@ -70,7 +72,24 @@ public class Main {
 		}
 		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
 		
-		MainView view = new MainView();
+		Set<IInfrastructureNodeImpl> nodesSet = new HashSet<IInfrastructureNodeImpl>();
+		Set<IInfrastructureNodeImpl> neighborsn1 = new HashSet<IInfrastructureNodeImpl>();
+		Set<IInfrastructureNodeImpl> neighborsn2 = new HashSet<IInfrastructureNodeImpl>();
+		Set<IInfrastructureNodeImpl> neighborsn3 = new HashSet<IInfrastructureNodeImpl>();
+		
+		InfrastructureNodeImpl n1 = new InfrastructureNodeImpl("id1", neighborsn1);
+		InfrastructureNodeImpl n2 = new InfrastructureNodeImpl("id2", neighborsn2);
+		InfrastructureNodeImpl n3 = new InfrastructureNodeImpl("id3", neighborsn3);
+		neighborsn1.add(n2);
+		neighborsn1.add(n3);
+		neighborsn2.add(n1);
+		neighborsn2.add(n3);
+		neighborsn3.add(n1);
+		neighborsn3.add(n2);
+		nodesSet.add(n1);
+		nodesSet.add(n2);
+		nodesSet.add(n3);				
+		MainView view = new MainView(nodesSet);
 	}
 
 }

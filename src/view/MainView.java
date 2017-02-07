@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,6 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import model.interfaces.IInfrastructureNodeImpl;
+
 public class MainView extends JFrame implements WindowListener, ActionListener {
 	/**
 	 * 
@@ -24,21 +27,24 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private JComboBox<String> nodes;
+	private Set<IInfrastructureNodeImpl> nodesSet;
 	private JButton open;
 	
-	public MainView(){
+	public MainView(Set<IInfrastructureNodeImpl> nodesSet){
 		this.panel = new JPanel();
-		initGUI(this);
+		this.nodesSet = nodesSet;
+		initGUI();
 		initPanel();
 		this.addWindowListener(this);
 		this.add(this.panel);
+		this.setVisible(true);
 	}
 	
 	private void initPanel(){
 		this.nodes = new JComboBox<String>();
-		this.nodes.addItem("id1");
-		this.nodes.addItem("id2");
-		this.nodes.addItem("id3");
+		for(IInfrastructureNodeImpl n : nodesSet){
+			this.nodes.addItem(n.getNodeID());
+		}
 		this.open = new JButton(" View info ");
 		this.open.addActionListener(this);
 		this.setLayout(new FlowLayout());
@@ -48,17 +54,17 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		this.panel.add(this.open);
 	}
 	
-	private void initGUI(JFrame frame){
-		frame.setResizable(true);
+	private void initGUI(){
+		this.setResizable(true);
 		Dimension d = new Dimension(500,100);
-		frame.setMaximumSize(d);
-		frame.setSize(d);
-		frame.setTitle("Main view");
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		this.setMaximumSize(d);
+		this.setSize(d);
+		this.setTitle("Main view");
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setLocation((dim.width) / 2,
-				(dim.height) / 2);
+		this.setLocation( (int)((dim.width) / 2 - (d.getWidth() / 2)) ,
+				(int)((dim.height) / 2 - (d.getHeight() / 2)));
 	}
 
 	@Override
