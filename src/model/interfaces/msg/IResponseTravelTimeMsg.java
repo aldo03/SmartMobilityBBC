@@ -17,4 +17,10 @@ public interface IResponseTravelTimeMsg extends IMobilityMsg {
 	 * @return travel ID
 	 */
 	int getTravelID();
+	
+	/**
+	 * it returns the value of a boolean that indicates if through the path there may be some ice on the road
+	 * @return
+	 */
+	boolean frozenDanger();
 }

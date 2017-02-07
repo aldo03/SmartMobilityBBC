@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import model.interfaces.IPair;
 import model.InfrastructureNodeImpl;
 import model.interfaces.IInfrastructureNodeImpl;
 import server.MainServer;
@@ -35,13 +35,16 @@ public class Main {
 		//MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
 		
-		String s = "s";
 		List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){
 			list.add(30);
 		}
 		MongoDBUtils.initTimes("id1");
 		MongoDBUtils.initTimes("id2");
+		MongoDBUtils.initTempHum("id1", 25.6, 33.4);
+		MongoDBUtils.initTempHum("id2", 25.8, 33.2);
+		MongoDBUtils.setTemp("id1", 25.7);
+		MongoDBUtils.setHum("id1", 35.7);
 		MongoDBUtils.initTravelTimes("id1", "id2", list);
 		MongoDBUtils.initTravelTimes("id1", "id3", list);
 		MongoDBUtils.setTravelTime("id1", "id2", 30, 40);
@@ -71,7 +74,9 @@ public class Main {
 			System.out.println(i);
 		}
 		MongoDBUtils.setTravelTime("id2", "id3", 30, 40);
-		
+		IPair<Double, Double> temp = MongoDBUtils.getTempHum("id1");
+		System.out.println(temp.getFirst());
+		System.out.println(temp.getSecond());
 		Set<IInfrastructureNodeImpl> nodesSet = new HashSet<IInfrastructureNodeImpl>();
 		Set<IInfrastructureNodeImpl> neighborsn1 = new HashSet<IInfrastructureNodeImpl>();
 		Set<IInfrastructureNodeImpl> neighborsn2 = new HashSet<IInfrastructureNodeImpl>();

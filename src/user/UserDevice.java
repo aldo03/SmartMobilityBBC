@@ -214,7 +214,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 		for (int i = 0; i < paths.size(); i++) {
 			IRequestTravelTimeMsg requestMsg = new RequestTravelTimeMsg(userID, MessagingUtils.REQUEST_TRAVEL_TIME, 0,
-					paths.get(i), i);
+					paths.get(i), i, false);
 			String toSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(requestMsg);
 			MomUtils.sendMsg(factory, userID, toSend);
 		}
@@ -228,6 +228,9 @@ public class UserDevice extends Thread implements IGPSObserver {
 		IResponseTravelTimeMsg message = JSONMessagingUtils.getResponseTravelTimeMsgFromString(msg);
 		this.travelID = message.getTravelID();
 		int time = message.getTravelTime();
+		if(message.frozenDanger()){
+			System.out.println("Frozen Danger on path number "+message.getTravelID());
+		}
 		this.travelTimes.add(new Pair<Integer, Integer>(this.travelID, time));
 	}
 	

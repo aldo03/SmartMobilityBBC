@@ -20,14 +20,14 @@ import model.ExpectedNumberOfVehicles;
 import model.PendingUsers;
 import model.TravelTimesByNumberOfVehicles;
 import model.UpdateTravelTimesThread;
-import model.interfaces.ICoordinates;
 import model.interfaces.ICurrentTimes;
 import model.interfaces.IExpectedNumberOfVehicles;
-import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
 import model.interfaces.IPair;
 import model.interfaces.IPendingUsers;
+import model.interfaces.ITemperatureHumidityObserver;
+import model.interfaces.ITemperatureHumiditySensor;
 import model.interfaces.ITravelTimesByNumberOfVehicles;
 import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;
@@ -39,8 +39,14 @@ import model.msg.ResponseTravelTimeMsg;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
+import utils.mongodb.MongoDBUtils;
 
-public class InfrastructureDevice extends Thread{
+public class InfrastructureDevice extends Thread implements ITemperatureHumidityObserver{
+	private static final int TEMP_THRESHOLD = 3;
+	private static final int HUM_THRESHOLD = 30;
+	private static final double DEF_TEMP = 25;
+	private static final double DEF_HUM = 50;
+	
 	private String id;
 	private Set<IPair<String, Integer>> nearNodesWeighted;
 	private String brokerHost;
@@ -49,6 +55,8 @@ public class InfrastructureDevice extends Thread{
 	private IExpectedNumberOfVehicles expectedVehicles;
 	private IPendingUsers pendingUsers;
 	private ICurrentTimes curTimes;
+	private double currentTemperature;
+	private double currentHumidity;
 	
 	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
 		this.id = id;
@@ -67,6 +75,13 @@ public class InfrastructureDevice extends Thread{
 			this.expectedVehicles.initVehicles(p.getFirst());
 			this.curTimes.initTimes(p.getFirst());
 		}
+		this.currentTemperature = DEF_TEMP;
+		this.currentHumidity = DEF_HUM;
+		MongoDBUtils.initTempHum(this.id, this.currentTemperature, this.currentHumidity);
+		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensorMock();
+		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
+		sensorThread.attachObserver(this);
+		sensorThread.start();
 		UpdateTravelTimesThread thread = new UpdateTravelTimesThread(this.curTimes, this.travelTimes);
 		thread.start();
 	}
@@ -148,13 +163,17 @@ public class InfrastructureDevice extends Thread{
 			int totalTime = msg.getCurrentTravelTime() + getTravelTime(nextNode, msg.getCurrentTravelTime());
 			//the user is added to the pending users
 			this.pendingUsers.addPendingUser(msg.getUserID(), msg.getTravelID(), totalTime);
+			boolean frozenDanger = msg.frozenDanger();
+			if(this.currentTemperature<TEMP_THRESHOLD&&this.currentHumidity>HUM_THRESHOLD){
+				frozenDanger = true;
+			}
 			IRequestTravelTimeMsg msgToSend = new RequestTravelTimeMsg(msg.getUserID(),
 					MessagingUtils.REQUEST_TRAVEL_TIME, totalTime, path,
-					msg.getTravelID());
+					msg.getTravelID(), frozenDanger);
 			String strToSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(msgToSend);
 			MomUtils.sendMsg(factory, nextNode.getNodeID(), strToSend);
 		} else { 								//This is the last node of the path
-			IResponseTravelTimeMsg m = new ResponseTravelTimeMsg(MessagingUtils.RESPONSE_TRAVEL_TIME, msg.getCurrentTravelTime(), msg.getTravelID());
+			IResponseTravelTimeMsg m = new ResponseTravelTimeMsg(MessagingUtils.RESPONSE_TRAVEL_TIME, msg.getCurrentTravelTime(), msg.getTravelID(), msg.frozenDanger());
 			String sToSend = JSONMessagingUtils.getStringfromResponseTravelTimeMsg(m);
 			MomUtils.sendMsg(factory, msg.getUserID(), sToSend);
 		}
@@ -171,6 +190,18 @@ public class InfrastructureDevice extends Thread{
 		int numOfVehiclesExpected = this.expectedVehicles.getVehicles(node.getNodeID(), time);
 		int travelTime = this.travelTimes.getTravelTime(node.getNodeID(), numOfVehiclesExpected);
 		return travelTime;
+	}
+
+	@Override
+	public void setTemperature(double temperature) {
+		this.currentTemperature = temperature;
+		MongoDBUtils.setTemp(this.id, temperature);
+	}
+
+	@Override
+	public void setHumidity(double humidity) {
+		this.currentHumidity = humidity;
+		MongoDBUtils.setHum(this.id, humidity);
 	}
 
 
