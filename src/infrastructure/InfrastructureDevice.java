@@ -78,7 +78,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.currentTemperature = DEF_TEMP;
 		this.currentHumidity = DEF_HUM;
 		MongoDBUtils.initTempHum(this.id, this.currentTemperature, this.currentHumidity);
-		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensorMock();
+		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensorMock(22, 30);
 		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
 		sensorThread.attachObserver(this);
 		sensorThread.start();

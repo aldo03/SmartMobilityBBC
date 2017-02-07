@@ -1,6 +1,7 @@
 package application;
 
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import java.util.Set;
 import model.interfaces.IPair;
 import model.InfrastructureNodeImpl;
 import model.interfaces.IInfrastructureNodeImpl;
-import server.MainServer;
 import user.UserDevice;
 import utils.mongodb.MongoDBUtils;
 import view.MainView;
