@@ -13,7 +13,9 @@ public class JSONInfrastructureNode extends JSONObject {
 	public JSONInfrastructureNode(IInfrastructureNode node){
 		try {
 			this.put(ID, node.getNodeID());
-			this.put(COORDINATES, new JSONCoordinates(node.getCoordinates()));
+			if(node.getCoordinates()!=null){
+				this.put(COORDINATES, new JSONCoordinates(node.getCoordinates()));
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

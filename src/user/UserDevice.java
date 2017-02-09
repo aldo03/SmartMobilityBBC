@@ -57,6 +57,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.travelID = 0;
 		this.userID = "id1";
 		this.chosenPath = new NodePath(new ArrayList<>());
+		this.pathsWithTravelID = new ArrayList<>();
 		this.start = start;
 		this.end = end;
 	}
@@ -94,7 +95,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 				} catch (TimeoutException e) {
 					e.printStackTrace();
 				}
-				System.out.println(" [x] Received A '" + message + "'");
+				System.out.println(" [User] "+userID+"Received A '" + message + "'");
 			}
 		};
 
@@ -187,6 +188,9 @@ public class UserDevice extends Thread implements IGPSObserver {
 		IResponsePathMsg message = JSONMessagingUtils.getResponsePathMsgFromString(msg);
 		List<INodePath> paths;
 		paths = message.getPaths();
+		for(INodePath path : paths){
+			path.printPath();
+		}
 		this.userID = message.getUserID();
 		this.brokerAddress = message.getBrokerAddress();
 		try {
@@ -201,7 +205,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 			IRequestTravelTimeMsg requestMsg = new RequestTravelTimeMsg(userID, MessagingUtils.REQUEST_TRAVEL_TIME, 0,
 					paths.get(i), i, false);
 			String toSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(requestMsg);
-			MomUtils.sendMsg(factory, userID, toSend);
+			MomUtils.sendMsg(factory, paths.get(i).getPathNodes().get(0).getNodeID(), toSend);
 		}
 		/*List<IInfrastructureNode> path = new ArrayList<>();
 		path.add(this.start);

@@ -80,7 +80,7 @@ public class JSONMessagingUtils {
 		obj.put(USER_ID, msg.getUserID());
 		obj.put(TRAVEL_ID, msg.getTravelID());
 		obj.put(TRAVEL_TIME, msg.getCurrentTravelTime());
-		obj.put(PATH, msg.getPath());
+		obj.put(PATH, new JSONNodePath(msg.getPath()));
 		obj.put(IS_FROZEN, msg.frozenDanger());
 		return obj.toString();	
 	}

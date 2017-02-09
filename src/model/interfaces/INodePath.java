@@ -24,4 +24,6 @@ public interface INodePath {
 	 * @param path
 	 */
 	void setPath(List<IInfrastructureNode> path);
+	
+	void printPath();
 }

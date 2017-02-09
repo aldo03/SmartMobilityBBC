@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import edu.asu.emit.qyan.alg.control.YenTopKShortestPathsAlg;
 import edu.asu.emit.qyan.alg.model.Graph;
@@ -30,6 +32,8 @@ import view.NodeView;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+		mongoLogger.setLevel(Level.SEVERE); 
 		MainServer server = new MainServer();	
 		MongoDBUtils.initDb();
 		List<IInfrastructureNode> nodes = new ArrayList<>();

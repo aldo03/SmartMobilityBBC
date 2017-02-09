@@ -28,4 +28,11 @@ public class NodePath implements INodePath {
 		this.pathNodes = path;
 	}
 
+	@Override
+	public void printPath(){
+		System.out.println("PATH:");
+		for(IInfrastructureNode node : this.pathNodes){
+			System.out.println("Node "+node.getNodeID());
+		}
+	}
 }
