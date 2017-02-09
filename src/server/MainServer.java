@@ -90,7 +90,7 @@ public class MainServer {
 		vertx.createHttpServer().websocketHandler(ws -> {
 			System.out.println("WebSocket opened!");
 			ws.handler(hnd -> {
-				System.out.println("data received: " + hnd.toString());
+				System.out.println("> Server: Data received: " + hnd.toString());
 				try {
 					int n;
 					n = MessagingUtils.getIntId(hnd.toString());

@@ -30,7 +30,7 @@ import view.MainView;
 import view.NodeView;
 
 public class Main {
-
+ 
 	public static void main(String[] args) throws Exception {
 		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
 		mongoLogger.setLevel(Level.SEVERE); 
