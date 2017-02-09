@@ -1,5 +1,6 @@
 package model;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,20 +11,18 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 
 	private String nodeID;
 	private ICoordinates coordinates;
-	private Set<IInfrastructureNodeImpl> nearNodes;
 	private Map<String,Integer> nearNodesWeighted;
 
-	public InfrastructureNodeImpl(String nodeID, Set<IInfrastructureNodeImpl> nearNodes) {
+	public InfrastructureNodeImpl(String nodeID) {
 		super();
 		this.nodeID = nodeID;
-		this.nearNodes = nearNodes;
+		this.nearNodesWeighted = new HashMap<>();
 	}
 
-	public InfrastructureNodeImpl(String nodeID, ICoordinates coordinates, Set<IInfrastructureNodeImpl> nearNodes) {
+	public InfrastructureNodeImpl(String nodeID, ICoordinates coordinates) {
 		super();
 		this.nodeID = nodeID;
 		this.coordinates = coordinates;
-		this.nearNodes = nearNodes;
 	}
 
 	@Override
@@ -36,15 +35,6 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 		return this.coordinates;
 	}
 
-	@Override
-	public Set<IInfrastructureNodeImpl> getNearNodes() {
-		return this.nearNodes;
-	}
-
-	@Override
-	public void setNearNode(IInfrastructureNodeImpl node) {
-		this.nearNodes.add(node);
-	}
 
 	@Override
 	public void setCoordinates(ICoordinates coordinates) {
@@ -76,8 +66,8 @@ public class InfrastructureNodeImpl implements IInfrastructureNodeImpl {
 	@Override
 	public Integer getIntNodeID() {
 		String s = this.nodeID;
-		s.replaceFirst("id", "");
-		Integer idInt = Integer.parseInt(s);
+		String str = s.substring(2, s.length());
+		Integer idInt = Integer.parseInt(str);
 		return idInt;
 	}
 }

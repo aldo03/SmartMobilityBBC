@@ -27,6 +27,18 @@ public class MongoDBUtils {
 	private static final String DB_CURRENT_TIMES = "currenttimesdb";
 	private static final String DB_TEMPHUM = "temphum";
 	
+	public static void initDb(){
+		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
+		db.drop();
+		db = mongoClient.getDatabase(DB_TIME_TRAVELS);
+		db.drop();
+		db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
+		db.drop();
+		db = mongoClient.getDatabase(DB_TEMPHUM);
+		db.drop();
+	}
+	
 	public static void initCurrentTime(String nodeId){
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);

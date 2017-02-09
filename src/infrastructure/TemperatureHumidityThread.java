@@ -23,7 +23,7 @@ public class TemperatureHumidityThread extends Thread{
 			this.observer.setHumidity(this.sensor.getHumidity());
 			this.observer.setTemperature(this.sensor.getTemperature());
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(60000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

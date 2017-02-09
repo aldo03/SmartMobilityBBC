@@ -9,20 +9,6 @@ import java.util.Set;
  *
  */
 public interface IInfrastructureNodeImpl extends IInfrastructureNode {
-
-
-	
-	/**
-	 * method invoked to get near nodes
-	 * @return near nodes
-	 */
-	Set<IInfrastructureNodeImpl> getNearNodes();
-	
-	/**
-	 * method invoked to set a new node in the near nodes
-	 * @param node
-	 */
-	void setNearNode(IInfrastructureNodeImpl node);
 	
 	/**
 	 * method invoked to get near nodes with time of travelling 

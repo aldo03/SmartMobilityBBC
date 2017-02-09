@@ -30,7 +30,7 @@ public class UpdateTravelTimesThread extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				Thread.sleep(RANGE);
+				Thread.sleep(RANGE*60);
 				for (String id : this.nodeIds) {
 					int avgTime = this.curTimes.getAverageTime(id);
 					int vehicleCount = this.curTimes.getVehicleCount(id);

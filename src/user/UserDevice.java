@@ -15,6 +15,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import model.Coordinates;
+import model.InfrastructureNode;
 import model.InfrastructureNodeImpl;
 import model.NodePath;
 import model.Pair;
@@ -47,15 +48,17 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private List<Pair<INodePath, Integer>> pathsWithTravelID;
 	private List<Pair<Integer, Integer>> travelTimes;
 	private INodePath chosenPath;
-	private InfrastructureNodeImpl start;
-	private InfrastructureNodeImpl end;
+	private InfrastructureNode start;
+	private InfrastructureNode end;
 	private int currentIndex;
 	private long timerValue;
 
-	public UserDevice(){
+	public UserDevice(InfrastructureNode start, InfrastructureNode end){
 		this.travelID = 0;
 		this.userID = "id1";
 		this.chosenPath = new NodePath(new ArrayList<>());
+		this.start = start;
+		this.end = end;
 	}
 	
 	private Channel initChannel() throws IOException, TimeoutException {
@@ -63,40 +66,15 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.factory.setHost(brokerAddress);
 		Connection connection = this.factory.newConnection();
 		Channel channel = connection.createChannel();
-		channel.queueDeclare("receiveQueue", false, false, false, null);
-		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+		channel.queueDeclare(this.userID, false, false, false, null);
 		return channel;
 	}
 
 	@Override
 	public void run() {
-		this.initNodes();
+		this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
+		this.currentIndex = 0;
 		this.requestPaths(start, end);
-		try {
-			this.startReceiving();
-			this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
-			INodePath selectedPath = evaluateBestPath();
-			this.currentIndex = 0;
-			this.timerValue = System.currentTimeMillis();
-			IPathAckMsg ackMsgToNode = new PathAckMsg(userID, MessagingUtils.PATH_ACK, selectedPath, 0);
-			String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
-			MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
-			// invio al server
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void initNodes() {
-		this.start = new InfrastructureNodeImpl("node1", new Coordinates(1.0,1.0), new HashSet<>());
-		this.end = new InfrastructureNodeImpl("node2", new Coordinates(1.0,1.0), new HashSet<>());
-		this.start.setNearNode(this.end);
-		this.end.setNearNode(this.start);
-	}
-
-	private void initNodes(InfrastructureNodeImpl start, InfrastructureNodeImpl end) {
-		this.start = start;
-		this.end = end;
 	}
 	
 	private void startReceiving() throws IOException, TimeoutException {
@@ -121,7 +99,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		};
 
 		try {
-			channel.basicConsume("receiveQueue", true, consumer);
+			channel.basicConsume(this.userID, true, consumer);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -164,6 +142,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 				bestPath = p.getFirst();
 			}
 		}
+		this.timerValue = System.currentTimeMillis();
+		this.travelID = minTravelID;
 		return bestPath;
 	}
 
@@ -209,6 +189,11 @@ public class UserDevice extends Thread implements IGPSObserver {
 		paths = message.getPaths();
 		this.userID = message.getUserID();
 		this.brokerAddress = message.getBrokerAddress();
+		try {
+			this.startReceiving();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		for (int j = 0; j < paths.size(); j++) {
 			this.pathsWithTravelID.add(new Pair<INodePath, Integer>(paths.get(j), j));
 		}
@@ -218,10 +203,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 			String toSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(requestMsg);
 			MomUtils.sendMsg(factory, userID, toSend);
 		}
-		List<IInfrastructureNode> path = new ArrayList<>();
+		/*List<IInfrastructureNode> path = new ArrayList<>();
 		path.add(this.start);
 		path.add(this.end);
-		this.chosenPath.setPath(path);
+		this.chosenPath.setPath(path);*/
 	}
 
 	private void handleResponseTravelTimeMsg(String msg) throws JSONException {
@@ -232,6 +217,21 @@ public class UserDevice extends Thread implements IGPSObserver {
 			System.out.println("Frozen Danger on path number "+message.getTravelID());
 		}
 		this.travelTimes.add(new Pair<Integer, Integer>(this.travelID, time));
+		if(this.travelTimes.size()==this.pathsWithTravelID.size()){
+			this.chosenPath = this.evaluateBestPath();
+			this.requestCoordinates();
+			try {
+				this.sendAckToNode();
+			} catch (IOException | TimeoutException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void sendAckToNode() throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
+		IPathAckMsg ackMsgToNode = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
+	    String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
+	    MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
 	}
 	
 	private void nearNextNode(int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
@@ -245,6 +245,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	public void notifyGps(ICoordinates coordinates) {		//we always check the next node. If the signal is lost, the range is too small.
 		if(this.chosenPath.getPathNodes().get(this.currentIndex+1).getCoordinates().isCloseEnough(coordinates)){
 			int time = (int) (System.currentTimeMillis()-this.timerValue);
+			this.timerValue = System.currentTimeMillis();
 			try {
 				this.nearNextNode(time);
 			} catch (JSONException | IOException | TimeoutException e) {
@@ -253,7 +254,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 	
-	public void requestCoordinates(){
+	private void requestCoordinates(){
 		Vertx vertx = Vertx.vertx();
 		HttpClient client = vertx.createHttpClient();
 

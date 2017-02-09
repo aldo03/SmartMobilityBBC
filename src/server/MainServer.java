@@ -40,7 +40,7 @@ import utils.messaging.MessagingUtils;
 public class MainServer {
 
 	private final static String USER_ID = "User-Device-";
-	private final static Integer K_SHORTEST_PATHS = 5;
+	private final static Integer K_SHORTEST_PATHS = 1;
 	private Graph graph;
 	private Set<IInfrastructureNodeImpl> nodesSet;
 	private Map<String, IInfrastructureNodeImpl> nodeMapId;
@@ -218,9 +218,19 @@ public class MainServer {
 		}
 		for (IInfrastructureNodeImpl start : this.nodesSet) {
 			Integer idStart = start.getIntNodeID();
-			for (IInfrastructureNodeImpl end : start.getNearNodes()) {
-				Integer idEnd = end.getIntNodeID();
-				this.graph.add_edge(idStart, idEnd, start.getNearNodesWeighted().get(end.getNodeID()));
+			for (String end : start.getNearNodesWeighted().keySet()) {
+				Integer idEnd = this.getIntNodeID(end);
+				this.graph.add_edge(idStart, idEnd, start.getNearNodesWeighted().get(end));
+			}
+		}
+	}
+	
+	public void setGraph(){
+		for (IInfrastructureNodeImpl start : this.nodesSet) {
+			Integer idStart = start.getIntNodeID();
+			for (String end : start.getNearNodesWeighted().keySet()) {
+				Integer idEnd = this.getIntNodeID(end);
+				this.graph.add_edge(idStart, idEnd, start.getNearNodesWeighted().get(end));
 			}
 		}
 	}
@@ -235,13 +245,30 @@ public class MainServer {
 		this.nodeMapId.put(node.getNodeID(), node);
 		BaseVertex v = new Vertex();
 		v.set_id(node.getIntNodeID());
-		for (IInfrastructureNodeImpl nearNode : node.getNearNodes()) {
-			Integer idNear = nearNode.getIntNodeID();
-			this.graph.add_edge(node.getIntNodeID(), idNear, node.getNearNodesWeighted().get(nearNode.getNodeID()));
+		this.graph.add_vertex(v);
+		/*for (String nearNode : node.getNearNodesWeighted().keySet()) {
+			Integer idNear = this.getIntNodeID(nearNode);
+			this.graph.add_edge(node.getIntNodeID(), idNear, node.getNearNodesWeighted().get(nearNode));
 
-		}
+		}*/
 	}
 	
+	private Integer getIntNodeID(String s) {		
+		String str = s.substring(2, s.length());
+		Integer idInt = Integer.parseInt(str);
+		return idInt;
+	}
 	
+	public void printNodes(){
+		for(IInfrastructureNodeImpl node : this.nodesSet){
+			System.out.println();
+			System.out.println("ID: "+node.getNodeID());
+			System.out.println("COORDS: "+node.getCoordinates().getLatitude()+"-"+node.getCoordinates().getLongitude());
+			System.out.println("NEAR NODES:");
+			for(String s : node.getNearNodesWeighted().keySet()){
+				System.out.println(s+" : "+node.getNearNodesWeighted().get(s));
+			}
+		}
+	}
 
 }

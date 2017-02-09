@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 
 public class MainView extends JFrame implements WindowListener, ActionListener {
@@ -27,10 +28,10 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private JComboBox<String> nodes;
-	private Set<IInfrastructureNodeImpl> nodesSet;
+	private Set<IInfrastructureNode> nodesSet;
 	private JButton open;
 	
-	public MainView(Set<IInfrastructureNodeImpl> nodesSet){
+	public MainView(Set<IInfrastructureNode> nodesSet){
 		this.panel = new JPanel();
 		this.nodesSet = nodesSet;
 		initGUI();
@@ -42,7 +43,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	
 	private void initPanel(){
 		this.nodes = new JComboBox<String>();
-		for(IInfrastructureNodeImpl n : nodesSet){
+		for(IInfrastructureNode n : nodesSet){
 			this.nodes.addItem(n.getNodeID());
 		}
 		this.open = new JButton(" View info ");

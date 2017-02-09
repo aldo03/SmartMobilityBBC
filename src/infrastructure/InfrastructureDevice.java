@@ -62,7 +62,6 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
 		this.brokerHost = brokerHost;
-		this.initializeDataStructures();
 	}
 	
 	private void initializeDataStructures(){
@@ -90,6 +89,8 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 	@Override
 	public void run() {
 		try {
+			this.initializeDataStructures();
+			System.out.println("DONE");
 			Channel channel = initChannel();
 			Consumer consumer = new DefaultConsumer(channel) {
 				@Override
@@ -114,7 +115,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.factory.setHost(this.brokerHost);
 		Connection connection = this.factory.newConnection();
 		Channel channel = connection.createChannel();
-		channel.queueDeclare("receiveQueue", false, false, false, null);
+		channel.queueDeclare(this.id, false, false, false, null);
 		return channel;
 	}
 
