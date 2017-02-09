@@ -48,12 +48,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private List<Pair<INodePath, Integer>> pathsWithTravelID;
 	private List<Pair<Integer, Integer>> travelTimes;
 	private INodePath chosenPath;
-	private InfrastructureNode start;
-	private InfrastructureNode end;
+	private IInfrastructureNode start;
+	private IInfrastructureNode end;
 	private int currentIndex;
 	private long timerValue;
 
-	public UserDevice(InfrastructureNode start, InfrastructureNode end){
+	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
 		this.userID = "id1";
 		this.chosenPath = new NodePath(new ArrayList<>());
@@ -110,7 +110,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		HttpClient client = vertx.createHttpClient();
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
 			ws.handler(data -> {
-				System.out.println("Received data " + data.toString("ISO-8859-1"));
+				System.out.println("> [User " + this.userID + "] Received data " + data.toString("ISO-8859-1"));
 				try {
 					this.handleResponsePathMsg(data.toString());
 				} catch (JSONException | IOException | TimeoutException e) {
