@@ -3,6 +3,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,12 +26,11 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     final static String CURRENT_TIMES = "Current Times";
     
     private String nodeId;
-    private JButton refreshTravelTimes;
-    private JButton refreshExpectedVehicles;
-    private JButton refreshCurrentTimes;
-    private JPanel card1, card2, card3;
+    private JButton refreshTravelTimes,refreshExpectedVehicles,refreshCurrentTimes, refreshSensorValues;
+    private JPanel card1, card2, card3, card4;
     private JScrollPane sp1, sp2, sp3;
     private JTable t1, t2, t3;
+    private JLabel temperature, humidity;
     private Map<String, List<Integer>> travelTimes, expectedVehicles, currentTimes;
     
 	public NodeView(String nodeId){
@@ -39,7 +39,6 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		initRefreshButtons();
 		initTables();
 		this.addComponentToPane(this.getContentPane());
-		
 	}
 	
 	private void initGUI(){
@@ -61,12 +60,19 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		this.refreshExpectedVehicles.addActionListener(this);
 		this.refreshCurrentTimes = new JButton("REFRESH");
 		this.refreshCurrentTimes.addActionListener(this);
+		this.refreshSensorValues = new JButton("REFRESH");
+		this.refreshSensorValues.addActionListener(this);
 	}
 	
 	private void initTables(){
 		//Create the "cards".
 		this.card1 = new JPanel() {
-            //Make the panel wider than it really needs, so
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			//Make the panel wider than it really needs, so
             //the window's wide enough for the tabs to stay
             //in one row.
             public Dimension getPreferredSize() {
@@ -77,6 +83,8 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         };
         this.card2 = new JPanel();        
         this.card3 = new JPanel();
+        this.card4 = new JPanel();
+        this.card4.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 30));
 		this.travelTimes = MongoDBUtils.getTimeTravels(this.nodeId);
 		this.t1 = this.createTable(travelTimes, true, card1, "These are the future Travel Times from node " + this.nodeId + " to its near nodes", this.refreshTravelTimes);
 		this.fillTable(travelTimes, true, t1);
@@ -97,12 +105,19 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     public void addComponentToPane(Container pane) {
         JTabbedPane tabbedPane = new JTabbedPane();
         
-        card1.add(sp1);
-        card2.add(sp2);
-        card3.add(sp3);
+        this.card1.add(this.sp1);
+        this.card2.add(this.sp2);
+        this.card3.add(this.sp3);
+        this.card4.add(new JLabel("You are currently watching real-time info about node " + this.nodeId + " ."));
+        this.temperature = new JLabel("This is the current temperature value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getFirst());
+        this.card4.add(this.temperature);
+        this.humidity = new JLabel("This is the current humidity value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getSecond());
+        this.card4.add(this.humidity);
+        this.card4.add(this.refreshSensorValues);
         tabbedPane.addTab(TRAVEL_TIMES, card1);
         tabbedPane.addTab(EXPECTED_VEHICLES, card2);
         tabbedPane.addTab(CURRENT_TIMES,card3);
+        tabbedPane.addTab("Environmental data", card4);
         pane.add(tabbedPane, BorderLayout.CENTER);
     }
     
@@ -113,17 +128,21 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     			max = tableContent.get(l).size()+1;
     	}
     	JTable table = new JTable(tableContent.keySet().size(), max);
-    	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
     	p.add(new JLabel(s));
     	p.add(b);
-    	if(travelTimes){
-			int range = 0;
-			for (int i = 1; i < table.getColumnCount(); i++) {
-				table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range + "/" + (range + 5));
-				range += 5;
-			}
-    	}	
+    	if(tableContent.keySet().size() > 0){
+    		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
+        	
+        	if(travelTimes){
+    			int range = 0;
+    			for (int i = 1; i < table.getColumnCount(); i++) {
+    				table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue(range + "/" + (range + 5));
+    				range += 5;
+    			}
+        	}	
+    	}
+    	
     	return table;
     }
     
@@ -190,6 +209,11 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
 			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);
 			this.sp3.repaint();
+		} else if(e.getSource().equals(this.refreshSensorValues)){
+	        
+
+			this.temperature.setText("This is the current temperature value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getFirst());
+			this.humidity.setText("This is the current humidity value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getSecond());
 		}
 		
 	}
