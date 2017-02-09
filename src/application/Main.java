@@ -28,7 +28,7 @@ import view.MainView;
 import view.NodeView;
 
 public class Main {
-
+ 
 	public static void main(String[] args) throws Exception {
 		MainServer server = new MainServer();	
 		MongoDBUtils.initDb();
