@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import edu.asu.emit.qyan.alg.control.YenTopKShortestPathsAlg;
+import edu.asu.emit.qyan.alg.model.Graph;
+import edu.asu.emit.qyan.alg.model.Path;
+import edu.asu.emit.qyan.alg.model.Vertex;
 import infrastructure.InfrastructureDevice;
 import model.interfaces.IPair;
 import server.MainServer;
@@ -154,6 +158,30 @@ public class Main {
 		nodesSet.add(n2);
 		nodesSet.add(n3);				
 		MainView view = new MainView(nodesSet);*/
+		
+		
+		
+		
+		
+		/*Graph g = new Graph();
+		Vertex v0 = new Vertex();
+		v0.set_id(0);
+		Vertex v1 = new Vertex();
+		v1.set_id(1);
+		Vertex v2 = new Vertex();
+		v2.set_id(2);
+		g.add_vertex(v0);
+		g.add_vertex(v1);
+		g.add_vertex(v2);
+		g.add_edge(0, 1, 45);
+		g.add_edge(0, 2, 56);
+		g.add_edge(1, 0, 34);
+		g.add_edge(1, 2, 89);
+		g.add_edge(2, 1, 23);
+		g.add_edge(2, 0, 56);
+		YenTopKShortestPathsAlg algorithm = new YenTopKShortestPathsAlg(g);
+		List<Path> paths = algorithm.get_shortest_paths(v0, v2, 6);
+		System.out.println(paths);*/
 	}
 
 }
