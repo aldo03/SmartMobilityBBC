@@ -138,7 +138,7 @@ public class MainServer {
 		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),
 				requestPathMsg.getEndingNode());
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
-		IResponsePathMsg responsePathMsg = new ResponsePathMsg(this.generateUserID(), MessagingUtils.RESPONSE_PATH,
+		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(),
 				pathList, brokerAddress);
 		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
 		Buffer buffer = Buffer.buffer().appendString(response);
