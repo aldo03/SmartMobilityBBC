@@ -40,7 +40,7 @@ import utils.messaging.MessagingUtils;
 public class MainServer {
 
 	private final static String USER_ID = "User-Device-";
-	private final static Integer K_SHORTEST_PATHS = 2;
+	private final static Integer K_SHORTEST_PATHS = 1;
 	private Graph graph;
 	private Set<IInfrastructureNodeImpl> nodesSet;
 	private Map<String, IInfrastructureNodeImpl> nodeMapId;
@@ -90,7 +90,7 @@ public class MainServer {
 		vertx.createHttpServer().websocketHandler(ws -> {
 			System.out.println("WebSocket opened!");
 			ws.handler(hnd -> {
-				System.out.println("> [Server] Data received: " + hnd.toString());
+				System.out.println("data received: " + hnd.toString());
 				try {
 					int n;
 					n = MessagingUtils.getIntId(hnd.toString());
@@ -138,7 +138,7 @@ public class MainServer {
 		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),
 				requestPathMsg.getEndingNode());
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
-		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(),
+		IResponsePathMsg responsePathMsg = new ResponsePathMsg(this.generateUserID(), MessagingUtils.RESPONSE_PATH,
 				pathList, brokerAddress);
 		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
 		Buffer buffer = Buffer.buffer().appendString(response);
@@ -180,15 +180,7 @@ public class MainServer {
 	 * @return list of shortest path
 	 */
 	public List<INodePath> getShortestPaths(IInfrastructureNode start, IInfrastructureNode finish) {
-		System.out.println("> StartNode: " + start.getNodeID());
-		System.out.println("> EndNode: " + finish.getNodeID());
 		YenTopKShortestPathsAlg algorithm = new YenTopKShortestPathsAlg(this.graph);
-		for(BaseVertex v : this.graph.get_vertex_list()){
-			System.out.println("> Graph vertex:" + v.get_id());
-			for(BaseVertex v1 : this.graph.get_adjacent_vertices(v)){
-				System.out.println("> Graph vertex adj:" + v.get_id());
-			}
-		}
 		BaseVertex startNode = new Vertex();
 		startNode.set_id(start.getIntNodeID());
 		BaseVertex endNode = new Vertex();
