@@ -1,5 +1,10 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,16 +14,15 @@ import java.util.Set;
 
 import org.json.JSONException;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
 import edu.asu.emit.qyan.alg.control.YenTopKShortestPathsAlg;
 import edu.asu.emit.qyan.alg.model.Graph;
 import edu.asu.emit.qyan.alg.model.Path;
 import edu.asu.emit.qyan.alg.model.Vertex;
 import edu.asu.emit.qyan.alg.model.abstracts.BaseVertex;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.*;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.StaticHandler;
 import model.NodePath;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
@@ -54,8 +58,8 @@ public class MainServer {
 		this.initVertx();
 	}
 
-	private void initVertx() {
-		Vertx vertx = Vertx.vertx();
+	private void initVertx() throws Exception{
+		/*Vertx vertx = Vertx.vertx();
 		Router router = Router.router(vertx);
 
 		router.route("/").handler(routingContext -> {
@@ -90,7 +94,7 @@ public class MainServer {
 		vertx.createHttpServer().websocketHandler(ws -> {
 			System.out.println("WebSocket opened!");
 			ws.handler(hnd -> {
-				System.out.println("> Server: Data received: " + hnd.toString());
+				System.out.println("data received: " + hnd.toString());
 				try {
 					int n;
 					n = MessagingUtils.getIntId(hnd.toString());
@@ -130,10 +134,61 @@ public class MainServer {
 			});
 			// if (req.uri().equals("/"))
 			// req.response().sendFile(path+"/ws.html");
-		}).requestHandler(router::accept).listen(8080);
+		}).requestHandler(router::accept).listen(8080);*/
+		HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        server.createContext("/", new HttpHandler(){
+        	 @Override
+             public void handle(HttpExchange t) throws IOException {
+        		 BufferedReader reader = new BufferedReader(new InputStreamReader(t.getRequestBody()));
+                 String msg = reader.readLine();
+  				 System.out.println("data received: " + msg);
+                 try {
+ 					int n;
+ 					n = MessagingUtils.getIntId(msg);
+ 					switch (n) {
+ 					case 1:
+ 						Thread t1 = new Thread() {
+ 							@Override
+ 							public void run() {
+ 								try {
+ 									handlePathAckMsg(t, msg);
+ 								} catch (JSONException e) {
+ 									e.printStackTrace();
+ 								} catch (IOException e) {
+									e.printStackTrace();
+								}
+ 							}
+
+ 						};
+ 						t1.start();
+ 						break;
+ 					case 2:
+ 						Thread t2 = new Thread() {
+ 							@Override
+ 							public void run() {
+ 								try {
+ 									handleRequestPathMsg(t, msg);
+ 								} catch (JSONException e) {
+ 									e.printStackTrace();
+ 								} catch (IOException e) {
+									e.printStackTrace();
+								}
+ 							}
+
+ 						};
+ 						t2.start();
+ 						break;
+ 					}
+ 				} catch (JSONException e) {
+ 					e.printStackTrace();
+ 				}
+        	 }
+        });
+        server.setExecutor(null); // creates a default executor
+        server.start();
 	}
 
-	private void handleRequestPathMsg(ServerWebSocket ws, String msg) throws JSONException {
+	private void handleRequestPathMsg(HttpExchange t, String msg) throws JSONException, IOException {
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
 		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),
 				requestPathMsg.getEndingNode());
@@ -145,11 +200,12 @@ public class MainServer {
 		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(),
 				pathList, brokerAddress);
 		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
-		Buffer buffer = Buffer.buffer().appendString(response);
-		ws.write(buffer);
+		OutputStreamWriter os = new OutputStreamWriter(t.getResponseBody());
+		os.write(response);
+		os.close();
 	}
 
-	private void handlePathAckMsg(ServerWebSocket ws, String msg) throws JSONException {
+	private void handlePathAckMsg(HttpExchange t, String msg) throws JSONException, IOException {
 		IPathAckMsg pathAckMsg = JSONMessagingUtils.getPathAckMsgFromString(msg);
 		List<IInfrastructureNode> pathWithCoordinates = new ArrayList<>();
 		INodePath pathFromMsg = pathAckMsg.getPath();
@@ -163,12 +219,12 @@ public class MainServer {
 		IPathAckMsg coordinatesMsg = new PathAckMsg(pathAckMsg.getUserID(), MessagingUtils.PATH_ACK, path,
 				pathAckMsg.getTravelID());
 		String response = JSONMessagingUtils.getStringfromPathAckMsg(coordinatesMsg);
-		Buffer buffer = Buffer.buffer().appendString(response);
-		ws.write(buffer);
+		OutputStreamWriter os = new OutputStreamWriter(t.getResponseBody());
+		os.write(response);
+		os.close();
 	}
 
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
-		// TODO generate broker address
 		return "localhost";
 	}
 
