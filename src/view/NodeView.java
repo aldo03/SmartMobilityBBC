@@ -9,7 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.swing.*;
 import utils.mongodb.MongoDBUtils;
@@ -32,6 +38,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     private JTable t1, t2, t3;
     private JLabel temperature, humidity;
     private Map<String, List<Integer>> travelTimes, expectedVehicles, currentTimes;
+    private Map<String, List<String>> expectedVehiclesTimes;
     
 	public NodeView(String nodeId){
 		this.nodeId = nodeId;
@@ -86,16 +93,32 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         this.card4 = new JPanel();
         this.card4.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 30));
 		this.travelTimes = MongoDBUtils.getTimeTravels(this.nodeId);
+		System.out.println("Creating Travel times table");
 		this.t1 = this.createTable(travelTimes, true, card1, "These are the future Travel Times from node " + this.nodeId + " to its near nodes", this.refreshTravelTimes);
 		this.fillTable(travelTimes, true, t1);
 		this.sp1 = new JScrollPane(t1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp1.repaint();
 		this.expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
+		System.out.println("Creating Expected v table");
+		this.expectedVehiclesTimes = new HashMap<String, List<String>>();
+		for(Map.Entry<String, List<Integer>> entry : this.expectedVehicles.entrySet()){
+			List<Integer> times = entry.getValue();
+			List<String> newTimes = new ArrayList<String>();
+			for(Integer i : times){
+				LocalDateTime dateTime = LocalDateTime.ofEpochSecond(i, 0, ZoneOffset.UTC);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm,a", Locale.ENGLISH);
+				String formattedDate = dateTime.format(formatter);
+				newTimes.add(formattedDate);
+			}
+			this.expectedVehiclesTimes.put(entry.getKey(), newTimes);
+		}
+		
 		this.t2 = this.createTable(expectedVehicles, false, card2, "These are the scheduled times of Expected Vehicles", this.refreshExpectedVehicles);
-		this.fillTable(expectedVehicles, false, t2);
+		this.fillTable(expectedVehiclesTimes, t2);
 		this.sp2 = new JScrollPane(t2, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp2.repaint();
 		this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
+		System.out.println("Creating curr times table");
 		this.t3 = this.createTable(currentTimes, false, card3, "These are the lastest Travel times towards near nodes", this.refreshCurrentTimes );
 		this.fillTable(currentTimes, false, t3);
 		this.sp3 = new JScrollPane(t3, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
@@ -155,6 +178,20 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         		}
         	j++;
     	} 	 	
+    }
+    
+    private void fillTable(Map<String, List<String>> tableContent, JTable table){ 		
+    	int j = 0;
+    	if(tableContent.size() > 0){
+    		for(String s : tableContent.keySet()){
+        		table.setValueAt(s, j, 0);        		
+            		for(int k = 1; k < tableContent.get(s).size() + 1; k++){
+            			table.setValueAt(tableContent.get(s).get(k-1), j, k);
+            		}
+            	j++;
+        	}
+    	}
+    	 	 	
     }
     
 	@Override
