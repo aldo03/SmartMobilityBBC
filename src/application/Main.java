@@ -32,11 +32,11 @@ import view.NodeView;
 public class Main {
  
 	public static void main(String[] args) throws Exception {
-		/*Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
 		mongoLogger.setLevel(Level.SEVERE); 
 		MainServer server = new MainServer();	
 		MongoDBUtils.initDb();
-		Set<IInfrastructureNode> nodes = new HashSet<>();
+		List<IInfrastructureNode> nodes = new ArrayList<>();
 		try {
 			Scanner s = new Scanner(new FileReader("graph.txt"));
 			int id;
@@ -79,12 +79,10 @@ public class Main {
 		server.setGraph();
 		server.printNodes();
 		
-		MainView v = new MainView(nodes);*/
-		
-		/*
+		MainView view = new MainView(new HashSet<>(nodes));
 		UserDevice user = new UserDevice(nodes.get(0), nodes.get(2));
 		user.run();
-		*/
+		
 		
 		/*MainServer server = new MainServer();
 		UserDevice device1 = new UserDevice();
@@ -104,7 +102,7 @@ public class Main {
 		//MainView view = new MainView();
 		//NodeView f = new NodeView("IdNode1");
 		
-		List<Integer> list = new ArrayList<>();
+		/*List<Integer> list = new ArrayList<>();
 		for(int i=0; i<200;i++){
 			list.add(30);
 		}
@@ -133,7 +131,7 @@ public class Main {
 		MongoDBUtils.initExpectedVehicles("id1", "id3");
 		MongoDBUtils.addExpectedVehicle("id1", "id2", 30);
 		MongoDBUtils.addExpectedVehicle("id1", "id2", 40);
-		MongoDBUtils.addExpectedVehicle("id1", "id3", 1486741858);
+		MongoDBUtils.addExpectedVehicle("id1", "id3", 50);
 		MongoDBUtils.removeExpectedVehicles("id1", "id2", 35);
 		MongoDBUtils.addExpectedVehicle("id1", "id2", 40);
 		MongoDBUtils.removeExpectedVehicles("id1", "id2", 41);
@@ -163,7 +161,7 @@ public class Main {
 		nodesSet.add(n1);
 		nodesSet.add(n2);
 		nodesSet.add(n3);				
-		MainView view = new MainView(nodesSet);
+		MainView view = new MainView(nodesSet);*/
 		
 		
 		

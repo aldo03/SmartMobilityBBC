@@ -25,12 +25,12 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private JComboBox<String> nodes;
-	private Set<IInfrastructureNodeImpl> nodesSet;
+	private Set<IInfrastructureNode> nodesSet;
 	private JButton open;
 	
-	public MainView(Set<IInfrastructureNodeImpl> nodesSet){
+	public MainView(Set<IInfrastructureNode> nodes2){
 		this.panel = new JPanel();
-		this.nodesSet = nodesSet;
+		this.nodesSet = nodes2;
 		initGUI();
 		initPanel();
 		this.addWindowListener(this);
