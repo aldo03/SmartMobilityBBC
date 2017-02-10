@@ -177,7 +177,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private void handlePathAckMsg(String msg) throws JSONException {
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
-		GpsMock gps = new GpsMock(this.chosenPath, new ArrayList<>());  //TODO: we have to find a way to create a mock path with mock times
+		List<Integer> times = new ArrayList<>();
+		times.add(2);
+		INodePath path = new NodePath(new ArrayList<>(this.chosenPath.getPathNodes()));
+		GpsMock gps = new GpsMock(path, times);  //TODO: we have to find a way to create a mock path with mock times
 		gps.attachObserver(this);
 		gps.start();
 	}
@@ -249,8 +252,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	@Override
 	public void notifyGps(ICoordinates coordinates) {		//we always check the next node. If the signal is lost, the range is too small.
+		this.chosenPath.printPath();
 		if(this.chosenPath.getPathNodes().get(this.currentIndex+1).getCoordinates().isCloseEnough(coordinates)){
 			int time = (int) (System.currentTimeMillis()-this.timerValue);
+			time/=1000;
 			this.timerValue = System.currentTimeMillis();
 			try {
 				this.nearNextNode(time);

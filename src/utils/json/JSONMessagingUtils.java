@@ -97,6 +97,7 @@ public class JSONMessagingUtils {
 	public static String getStringfromTravelTimeAckMsg(ITravelTimeAckMsg msg) throws JSONException{
 		JSONObject obj = new JSONObject();
 		obj.put(MSG_ID, msg.getMsgID());
+		obj.put(USER_ID, msg.getUserID());
 		obj.put(FIRST_NODE, new JSONInfrastructureNode(msg.getFirstNode()));
 		obj.put(SECOND_NODE, new JSONInfrastructureNode(msg.getSecondNode()));
 		obj.put(TRAVEL_TIME, msg.getTravelTime());

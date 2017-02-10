@@ -33,7 +33,11 @@ public class CurrentTimes implements ICurrentTimes {
 		for(int i : l){
 			sum+=i;
 		}
-		return sum/l.size();
+		if(l.size()!=0){
+			return sum/l.size();
+		} else {
+			return -1;
+		}
 	}
 
 
