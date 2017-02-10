@@ -92,31 +92,23 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         this.card3 = new JPanel();
         this.card4 = new JPanel();
         this.card4.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 30));
+        
 		this.travelTimes = MongoDBUtils.getTimeTravels(this.nodeId);
 		System.out.println("Creating Travel times table");
 		this.t1 = this.createTable(travelTimes, true, card1, "These are the future Travel Times from node " + this.nodeId + " to its near nodes", this.refreshTravelTimes);
 		this.fillTable(travelTimes, true, t1);
 		this.sp1 = new JScrollPane(t1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp1.repaint();
+		
 		this.expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
 		System.out.println("Creating Expected v table");
-		this.expectedVehiclesTimes = new HashMap<String, List<String>>();
-		for(Map.Entry<String, List<Integer>> entry : this.expectedVehicles.entrySet()){
-			List<Integer> times = entry.getValue();
-			List<String> newTimes = new ArrayList<String>();
-			for(Integer i : times){
-				LocalDateTime dateTime = LocalDateTime.ofEpochSecond(i, 0, ZoneOffset.UTC);
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm,a", Locale.ENGLISH);
-				String formattedDate = dateTime.format(formatter);
-				newTimes.add(formattedDate);
-			}
-			this.expectedVehiclesTimes.put(entry.getKey(), newTimes);
-		}
-		
+		this.getExpectedVehicleTimes(expectedVehicles);
 		this.t2 = this.createTable(expectedVehicles, false, card2, "These are the scheduled times of Expected Vehicles", this.refreshExpectedVehicles);
+		this.expectedVehiclesTimes = this.getExpectedVehicleTimes(expectedVehicles);
 		this.fillTable(expectedVehiclesTimes, t2);
 		this.sp2 = new JScrollPane(t2, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp2.repaint();
+		
 		this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
 		System.out.println("Creating curr times table");
 		this.t3 = this.createTable(currentTimes, false, card3, "These are the lastest Travel times towards near nodes", this.refreshCurrentTimes );
@@ -125,9 +117,26 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		this.sp3.repaint();
 	}
 	
+	private Map<String, List<String>> getExpectedVehicleTimes(Map<String, List<Integer>> map){
+		Map<String, List<String>> expectedVehiclesTimes = new HashMap<String, List<String>>();
+		for(Map.Entry<String, List<Integer>> entry : map.entrySet()){
+			List<Integer> times = entry.getValue();
+			List<String> newTimes = new ArrayList<String>();
+			for(Integer i : times){
+				LocalDateTime dateTime = LocalDateTime.ofEpochSecond(i, 0, ZoneOffset.UTC);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm,a", Locale.ENGLISH);
+				String formattedDate = dateTime.format(formatter);
+				newTimes.add(formattedDate);
+			}
+			System.out.println(entry.getKey());
+			expectedVehiclesTimes.put(entry.getKey(), newTimes);
+		}
+		return expectedVehiclesTimes;
+	}
+	
+	
     public void addComponentToPane(Container pane) {
-        JTabbedPane tabbedPane = new JTabbedPane();
-        
+        JTabbedPane tabbedPane = new JTabbedPane();   
         this.card1.add(this.sp1);
         this.card2.add(this.sp2);
         this.card3.add(this.sp3);
@@ -145,14 +154,15 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     }
     
     private JTable createTable(Map<String, List<Integer>> tableContent, boolean travelTimes, JPanel p, String s, JButton b){
-    	int max = 0;
+    	int max = 1;
     	for (String l : tableContent.keySet()){
-    		if(tableContent.get(l).size() > max)
+    		if(tableContent.get(l).size() >= max)
     			max = tableContent.get(l).size()+1;
     	}
     	JTable table = new JTable(tableContent.keySet().size(), max);
     	p.add(new JLabel(s));
     	p.add(b);
+    	System.out.println("> Size:" + tableContent.keySet().size());
     	if(tableContent.keySet().size() > 0){
     		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
@@ -170,6 +180,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     }
     
     private void fillTable(Map<String, List<Integer>> tableContent, boolean travelTimes, JTable table){ 		
+    	SwingUtilities.invokeLater(new Runnable(){public void run(){
     	int j = 0;
     	for(String s : tableContent.keySet()){
     		table.setValueAt(s, j, 0);        		
@@ -177,20 +188,25 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         			table.setValueAt(tableContent.get(s).get(k-1), j, k);
         		}
         	j++;
-    	} 	 	
+    	} 	 
+    	}});
     }
     
-    private void fillTable(Map<String, List<String>> tableContent, JTable table){ 		
-    	int j = 0;
-    	if(tableContent.size() > 0){
-    		for(String s : tableContent.keySet()){
-        		table.setValueAt(s, j, 0);        		
-            		for(int k = 1; k < tableContent.get(s).size() + 1; k++){
-            			table.setValueAt(tableContent.get(s).get(k-1), j, k);
-            		}
-            	j++;
+    private void fillTable(Map<String, List<String>> tableContent, JTable table){
+    	SwingUtilities.invokeLater(new Runnable(){public void run(){
+    		int j = 0;
+        	if(tableContent.entrySet().size() > 0){
+        		
+        		for(String s : tableContent.keySet()){
+            		table.setValueAt(s, j, 0);        		
+                		for(int k = 1; k < tableContent.get(s).size() + 1; k++){
+                			table.setValueAt(tableContent.get(s).get(k-1), j, k);
+                		}
+                	j++;
+            	}
         	}
-    	}
+    	}});
+    	
     	 	 	
     }
     
@@ -241,14 +257,12 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.fillTable(MongoDBUtils.getTimeTravels(this.nodeId), true, t1);
 			this.sp1.repaint();
 		} else if(e.getSource().equals(this.refreshExpectedVehicles)){
-			this.fillTable(MongoDBUtils.getExpectedVehicles(this.nodeId), false, t2);
+			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), t2);
 			this.sp2.repaint();
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
 			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);
 			this.sp3.repaint();
 		} else if(e.getSource().equals(this.refreshSensorValues)){
-	        
-
 			this.temperature.setText("This is the current temperature value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getFirst());
 			this.humidity.setText("This is the current humidity value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getSecond());
 		}
