@@ -260,7 +260,14 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), t2);
 			this.sp2.repaint();
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
-			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);
+			/*t3.removeAll();
+			t3 = new JTable(MongoDBUtils.getCurrentTimes(this.nodeId).keySet().size(),1);
+			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);*/
+			this.sp3.removeAll();
+			JTable t = this.createTable(currentTimes, false, card3, "These are the lastest Travel times towards near nodes", this.refreshCurrentTimes );
+			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t);
+			sp3.add(t);
+			this.sp3.revalidate();
 			this.sp3.repaint();
 		} else if(e.getSource().equals(this.refreshSensorValues)){
 			this.temperature.setText("This is the current temperature value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getFirst());
