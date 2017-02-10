@@ -281,7 +281,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	}
 	
 	private void requestCoordinates(){
-		Vertx vertx = Vertx.vertx();
+		/*Vertx vertx = Vertx.vertx();
 		HttpClient client = vertx.createHttpClient();
 
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
@@ -300,7 +300,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		});
+		});*/
+		IPathAckMsg pathAckMsg = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
+		try {
+			String pathAckString = JSONMessagingUtils.getStringfromPathAckMsg(pathAckMsg);
+			this.handlePathAckMsg(HttpUtils.POST(pathAckString));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
