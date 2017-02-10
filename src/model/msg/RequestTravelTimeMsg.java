@@ -19,7 +19,7 @@ public class RequestTravelTimeMsg implements IRequestTravelTimeMsg {
 		this.currentTravelTime = currentTravelTime;
 		this.path = path;
 		this.travelId = travelId;
-		this.frozen = true;
+		this.frozen = frozen;
 	}
 
 	@Override

@@ -69,10 +69,12 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.expectedVehicles = new ExpectedNumberOfVehicles(this.id);
 		this.pendingUsers = new PendingUsers();
 		this.curTimes = new CurrentTimes(this.id);
+		UpdateTravelTimesThread updateThread = new UpdateTravelTimesThread(this.curTimes, this.travelTimes);
 		for(IPair<String, Integer> p : this.nearNodesWeighted){
 			this.travelTimes.initTravelTimes(p.getFirst(), p.getSecond());
 			this.expectedVehicles.initVehicles(p.getFirst());
 			this.curTimes.initTimes(p.getFirst());
+			updateThread.initNode(p.getFirst());
 		}
 		this.currentTemperature = DEF_TEMP;
 		this.currentHumidity = DEF_HUM;
@@ -81,8 +83,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
 		sensorThread.attachObserver(this);
 		sensorThread.start();
-		UpdateTravelTimesThread thread = new UpdateTravelTimesThread(this.curTimes, this.travelTimes);
-		thread.start();
+		updateThread.start();
 	}
 	
 
