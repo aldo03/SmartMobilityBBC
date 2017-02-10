@@ -97,6 +97,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 						byte[] body) throws IOException {
 					String message = new String(body, "UTF-8");
+					System.out.println("[Infrastructure Device "+id+" received "+message);
 					try {
 						switchArrivedMessage(message);
 					} catch (TimeoutException e) {
@@ -156,7 +157,7 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 
 	private void handleRequestTravelTimeMsg(String message)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
-		System.out.println(message);
+		//System.out.println(message);
 		IRequestTravelTimeMsg msg = JSONMessagingUtils.getRequestTravelTimeMsgFromString(message);
 		INodePath path = msg.getPath();
 		path.removeFirstNode();					 //The path is forwarded without the current node

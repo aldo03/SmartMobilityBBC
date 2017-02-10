@@ -55,7 +55,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
-		this.userID = "id1";
+		this.userID = "newuser";
 		this.chosenPath = new NodePath(new ArrayList<>());
 		this.pathsWithTravelID = new ArrayList<>();
 		this.start = start;
@@ -90,12 +90,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 					byte[] body) throws IOException {
 				String message = new String(body, "UTF-8");
+				System.out.println(" [User] "+userID+" received  '" + message + "'");
 				try {
 					switchArrivedMsg(message);
 				} catch (TimeoutException e) {
 					e.printStackTrace();
 				}
-				System.out.println(" [User] "+userID+"Received A '" + message + "'");
 			}
 		};
 
@@ -184,7 +184,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	private void handleResponsePathMsg(String msg)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
-		System.out.println(msg);
+		//System.out.println(msg);
 		IResponsePathMsg message = JSONMessagingUtils.getResponsePathMsgFromString(msg);
 		List<INodePath> paths;
 		paths = message.getPaths();
@@ -221,7 +221,9 @@ public class UserDevice extends Thread implements IGPSObserver {
 			System.out.println("Frozen Danger on path number "+message.getTravelID());
 		}
 		this.travelTimes.add(new Pair<Integer, Integer>(this.travelID, time));
+		System.out.println("[User "+this.userID+" PathsWithTravelID size:"+ this.pathsWithTravelID.size());
 		if(this.travelTimes.size()==this.pathsWithTravelID.size()){
+			System.out.println("[User "+this.userID+": All times received");
 			this.chosenPath = this.evaluateBestPath();
 			this.requestCoordinates();
 			try {
@@ -264,7 +266,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
 			ws.handler(data -> {
-				System.out.println("Received data " + data.toString("ISO-8859-1"));
+				System.out.println("> [User " + this.userID + "] Received data " + data.toString("ISO-8859-1"));
 				try {
 					this.handlePathAckMsg(data.toString());
 				} catch (JSONException e) {
