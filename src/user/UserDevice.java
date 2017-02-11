@@ -35,6 +35,7 @@ import model.msg.RequestPathMsg;
 import model.msg.RequestTravelTimeMsg;
 import model.msg.TravelTimeAckMsg;
 import utils.gps.GpsMock;
+import utils.http.HttpUtils;
 import utils.json.JSONMessagingUtils;
 import utils.messaging.MessagingUtils;
 import utils.mom.MomUtils;
@@ -107,11 +108,11 @@ public class UserDevice extends Thread implements IGPSObserver {
 	}
 
 	private void requestPaths(IInfrastructureNode start, IInfrastructureNode end) {
-		Vertx vertx = Vertx.vertx();
+		/*Vertx vertx = Vertx.vertx();
 		HttpClient client = vertx.createHttpClient();
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
 			ws.handler(data -> {
-				System.out.println("> [User " + this.userID + "] Received data " + data.toString("ISO-8859-1"));
+				System.out.println("Received data " + data.toString("ISO-8859-1"));
 				try {
 					this.handleResponsePathMsg(data.toString());
 				} catch (JSONException | IOException | TimeoutException e) {
@@ -125,7 +126,21 @@ public class UserDevice extends Thread implements IGPSObserver {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		});
+		});*/
+		IRequestPathMsg requestMsg = new RequestPathMsg(MessagingUtils.REQUEST_PATH, this.start, this.end);
+		try {
+			String requestPathString = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
+			this.handleResponsePathMsg(HttpUtils.POST(requestPathString));
+			System.out.println(requestPathString);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private INodePath evaluateBestPath() {
@@ -266,7 +281,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	}
 	
 	private void requestCoordinates(){
-		Vertx vertx = Vertx.vertx();
+		/*Vertx vertx = Vertx.vertx();
 		HttpClient client = vertx.createHttpClient();
 
 		client.websocket(8080, "localhost", "/some-uri", ws -> {
@@ -285,7 +300,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		});
+		});*/
+		IPathAckMsg pathAckMsg = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
+		try {
+			String pathAckString = JSONMessagingUtils.getStringfromPathAckMsg(pathAckMsg);
+			this.handlePathAckMsg(HttpUtils.POST(pathAckString));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
