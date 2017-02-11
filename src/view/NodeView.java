@@ -145,11 +145,12 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     }
     
     private JTable createTable(Map<String, List<Integer>> tableContent, boolean travelTimes, JPanel p, String s, JButton b){
-    	int max = 0;
+    	int max = 1;
     	for (String l : tableContent.keySet()){
-    		if(tableContent.get(l).size() > max)
+    		if(tableContent.get(l).size() >= max)
     			max = tableContent.get(l).size()+1;
     	}
+    	System.out.println("MAX"+max);
     	JTable table = new JTable(tableContent.keySet().size(), max);
     	p.add(new JLabel(s));
     	p.add(b);
@@ -244,6 +245,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.fillTable(MongoDBUtils.getExpectedVehicles(this.nodeId), false, t2);
 			this.sp2.repaint();
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
+			System.out.println(MongoDBUtils.getCurrentTimes(this.nodeId).get("id3").size());
 			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);
 			this.sp3.repaint();
 		} else if(e.getSource().equals(this.refreshSensorValues)){
