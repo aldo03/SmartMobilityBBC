@@ -25,4 +25,11 @@ public interface ICoordinates {
 	 * @return true if the coordinates are close enough, false otherwise
 	 */
 	boolean isCloseEnough(ICoordinates coordinates);
+	
+	/**
+	 * get the distance between two points
+	 * @param coordinates
+	 * @return distance
+	 */
+	double getDistance(ICoordinates coordinates);
 }

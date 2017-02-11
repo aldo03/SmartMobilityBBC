@@ -40,4 +40,9 @@ public class Coordinates implements ICoordinates {
 	    double dist = earthRadius * c;
 	    return dist;
 	}
+
+	@Override
+	public double getDistance(ICoordinates coordinates) {
+		return this.distFrom(this.latitude, this.longitude, coordinates.getLatitude(), coordinates.getLongitude());
+	}
 }

@@ -24,6 +24,7 @@ import edu.asu.emit.qyan.alg.model.Path;
 import edu.asu.emit.qyan.alg.model.Vertex;
 import edu.asu.emit.qyan.alg.model.abstracts.BaseVertex;
 import model.NodePath;
+import model.interfaces.ICoordinates;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
@@ -191,8 +192,8 @@ public class MainServer {
 
 	private void handleRequestPathMsg(HttpExchange t, String msg) throws JSONException, IOException{
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
-		List<INodePath> pathList = this.getShortestPaths(requestPathMsg.getStartingNode(),
-				requestPathMsg.getEndingNode());
+		List<INodePath> pathList = this.getShortestPaths(this.findNearNode(requestPathMsg.getStartingNode()),this.findNearNode(
+				requestPathMsg.getEndingNode()));
 		System.out.println("SERVER PATH SENT");
 		for(INodePath node : pathList){
 			node.printPath();
@@ -338,5 +339,18 @@ public class MainServer {
 			}
 		}
 	}
-
+	
+	private IInfrastructureNode findNearNode(IInfrastructureNode node){
+		double distance = Double.MAX_VALUE;
+		IInfrastructureNode near = node;
+		for(IInfrastructureNode n: this.nodesSet){
+			double temp = n.getCoordinates().getDistance(node.getCoordinates());
+			if(temp<distance){
+				distance = temp;
+				near = n;
+			}
+		}
+		return near;
+	}
+	
 }
