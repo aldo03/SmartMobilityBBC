@@ -53,6 +53,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private IInfrastructureNode end;
 	private int currentIndex;
 	private long timerValue;
+	private List<Integer> prefixedTimes;
 
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
@@ -61,6 +62,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.pathsWithTravelID = new ArrayList<>();
 		this.start = start;
 		this.end = end;
+	}
+	
+	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes){
+		this.travelID = 0;
+		this.userID = "newuser";
+		this.chosenPath = new NodePath(new ArrayList<>());
+		this.pathsWithTravelID = new ArrayList<>();
+		this.start = start;
+		this.end = end;
+		this.prefixedTimes = prefixedTimes;
 	}
 	
 	private Channel initChannel() throws IOException, TimeoutException {
@@ -192,10 +203,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private void handlePathAckMsg(String msg) throws JSONException {
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
-		List<Integer> times = new ArrayList<>();
-		times.add(2);
+		/*List<Integer> times = new ArrayList<>();
+		times.add(2);*/
 		INodePath path = new NodePath(new ArrayList<>(this.chosenPath.getPathNodes()));
-		GpsMock gps = new GpsMock(path, times);  //TODO: we have to find a way to create a mock path with mock times
+		GpsMock gps = new GpsMock(path, this.prefixedTimes);  //TODO: we have to find a way to create a mock path with mock times
 		gps.attachObserver(this);
 		gps.start();
 	}
