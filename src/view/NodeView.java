@@ -33,6 +33,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     
     private String nodeId;
     private JButton refreshTravelTimes,refreshExpectedVehicles,refreshCurrentTimes, refreshSensorValues;
+    private JLabel currTimesLbl;
     private JPanel card1, card2, card3, card4;
     private JScrollPane sp1, sp2, sp3;
     private JTable t1, t2, t3;
@@ -111,7 +112,8 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		
 		this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
 		System.out.println("Creating curr times table");
-		this.t3 = this.createTable(currentTimes, false, card3, "These are the lastest Travel times towards near nodes", this.refreshCurrentTimes );
+		this.currTimesLbl = new JLabel("These are the lastest Travel times towards near nodes");
+		this.t3 = this.createTable(currentTimes, false, card3, this.currTimesLbl.getText(), this.refreshCurrentTimes );
 		this.fillTable(currentTimes, false, t3);
 		this.sp3 = new JScrollPane(t3, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp3.repaint();
@@ -176,9 +178,27 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     			}
         	}	
     	}
-    	
     	return table;
     }
+    
+    private JTable createTable(Map<String, List<Integer>> tableContent){
+    	int max = 1;
+    	for (String l : tableContent.keySet()){
+    		if(tableContent.get(l).size() >= max)
+    			max = tableContent.get(l).size()+1;
+    	}
+    	System.out.println("MAX"+max);
+    	JTable table = new JTable(tableContent.keySet().size(), max);
+
+    	System.out.println("> Size:" + tableContent.keySet().size());
+    	if(tableContent.keySet().size() > 0){
+    		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
+    	}
+    	return table;
+    }
+    
+    
     
     private void fillTable(Map<String, List<Integer>> tableContent, boolean travelTimes, JTable table){ 		
     	SwingUtilities.invokeLater(new Runnable(){public void run(){
@@ -212,44 +232,31 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     }
     
 	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowOpened(WindowEvent e) {		
 	}
 
 	@Override
-	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowClosing(WindowEvent e) {		
 	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowClosed(WindowEvent e) {		
 	}
 
 	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowIconified(WindowEvent e) {		
 	}
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowDeiconified(WindowEvent e) {		
 	}
 
 	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void windowActivated(WindowEvent e) {		
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -261,17 +268,12 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), t2);
 			this.sp2.repaint();
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
-			System.out.println(MongoDBUtils.getCurrentTimes(this.nodeId).get("id3").size());
-			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);
-			/*t3.removeAll();
-			t3 = new JTable(MongoDBUtils.getCurrentTimes(this.nodeId).keySet().size(),1);
-			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t3);*/
-			this.sp3.removeAll();
-			JTable t = this.createTable(currentTimes, false, card3, "These are the lastest Travel times towards near nodes", this.refreshCurrentTimes );
-			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t);
+			System.out.println(MongoDBUtils.getCurrentTimes(this.nodeId).get("id3").size());	
+			this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
+			JTable t = this.createTable(currentTimes);	
 			sp3.add(t);
-			this.sp3.revalidate();
-			this.sp3.repaint();
+			this.fillTable(MongoDBUtils.getCurrentTimes(this.nodeId), false, t);
+			this.sp3.setViewportView(t);
 		} else if(e.getSource().equals(this.refreshSensorValues)){
 			this.temperature.setText("This is the current temperature value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getFirst());
 			this.humidity.setText("This is the current humidity value detected on the node:   " + MongoDBUtils.getTempHum(this.nodeId).getSecond());
