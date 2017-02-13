@@ -32,11 +32,11 @@ public class UpdateTravelTimesThread extends Thread {
 			while (true) {
 				Thread.sleep(RANGE*30);
 				for (String id : this.nodeIds) {
-					System.out.println("[UpdateTravelTimesThread] id: "+id);
+					//System.out.println("[UpdateTravelTimesThread] id: "+id);
 					int avgTime = this.curTimes.getAverageTime(id);
 					int vehicleCount = this.curTimes.getVehicleCount(id);
 					if(vehicleCount>0){
-						System.out.println("[UpdateTravelTimesThread] id: "+id+" vehicle count: "+vehicleCount+" avg: "+avgTime);
+						//System.out.println("[UpdateTravelTimesThread] id: "+id+" vehicle count: "+vehicleCount+" avg: "+avgTime);
 						this.travelTimes.setTravelTime(id, vehicleCount, avgTime);
 					}
 				}

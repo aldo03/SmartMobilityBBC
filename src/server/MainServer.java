@@ -46,7 +46,7 @@ import utils.messaging.MessagingUtils;
 public class MainServer {
 
 	private final static String USER_ID = "User-Device-";
-	private final static Integer K_SHORTEST_PATHS = 2;
+	private final static Integer K_SHORTEST_PATHS = 5;
 	private Graph graph;
 	private Set<IInfrastructureNodeImpl> nodesSet;
 	private Map<String, IInfrastructureNodeImpl> nodeMapId;
@@ -195,10 +195,9 @@ public class MainServer {
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
 		List<INodePath> pathList = this.getShortestPaths(this.findNearNode(requestPathMsg.getStartingNode()),this.findNearNode(
 				requestPathMsg.getEndingNode()));
-		System.out.println("SERVER PATH SENT");
-		for(INodePath node : pathList){
+		/*for(INodePath node : pathList){
 			node.printPath();
-		}
+		}*/
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
 		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(),
 				pathList, brokerAddress);
@@ -246,7 +245,6 @@ public class MainServer {
 	 * @return list of shortest path
 	 */
 	public List<INodePath> getShortestPaths(IInfrastructureNode start, IInfrastructureNode finish) {
-		System.out.println("START: "+ start.getIntNodeID()+" END: "+finish.getIntNodeID());
 		YenTopKShortestPathsAlg algorithm = new YenTopKShortestPathsAlg(this.graph);
 		BaseVertex startNode = this.graph.get_vertex(start.getIntNodeID());
 		BaseVertex endNode = this.graph.get_vertex(finish.getIntNodeID());
@@ -265,8 +263,7 @@ public class MainServer {
 				nodeList.add(this.nodeMapId.get(id));
 			}
 			nodePath.setPath(nodeList);
-			System.out.println("PATH TRANSFORM");
-			nodePath.printPath();
+			//System.out.println("PATH TRANSFORM");
 			pathList.add(nodePath);
 		}
 		return pathList;
@@ -299,7 +296,6 @@ public class MainServer {
 			Integer idStart = start.getIntNodeID();
 			for (String end : start.getNearNodesWeighted().keySet()) {
 				Integer idEnd = this.getIntNodeID(end);
-				System.out.println("V1: "+idStart+" V2: "+idEnd+" dist: "+start.getNearNodesWeighted().get(end));
 				this.graph.add_edge(idStart, idEnd, start.getNearNodesWeighted().get(end));
 			}
 		}

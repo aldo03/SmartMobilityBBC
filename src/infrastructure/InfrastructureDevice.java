@@ -90,8 +90,9 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 	@Override
 	public void run() {
 		try {
+			System.out.println("[Infrastructure Device "+this.id+" started... Initializing data structures");
 			this.initializeDataStructures();
-			System.out.println("DONE");
+			System.out.println("[Infrastructure Device "+this.id+": Initialization DONE");
 			Channel channel = initChannel();
 			Consumer consumer = new DefaultConsumer(channel) {
 				@Override

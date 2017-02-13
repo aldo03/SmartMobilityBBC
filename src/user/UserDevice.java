@@ -142,7 +142,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		try {
 			String requestPathString = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
 			this.handleResponsePathMsg(HttpUtils.POST(requestPathString));
-			System.out.println(requestPathString);
+			//System.out.println(requestPathString);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
@@ -201,6 +201,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	}
 
 	private void handlePathAckMsg(String msg) throws JSONException {
+		System.out.println("[User "+this.userID+" received: "+msg);
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
 		/*List<Integer> times = new ArrayList<>();
@@ -213,13 +214,13 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	private void handleResponsePathMsg(String msg)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
-		//System.out.println(msg);
+		System.out.println("[User "+this.userID+" received: "+msg);
 		IResponsePathMsg message = JSONMessagingUtils.getResponsePathMsgFromString(msg);
 		List<INodePath> paths;
 		paths = message.getPaths();
-		for(INodePath path : paths){
+		/*for(INodePath path : paths){
 			path.printPath();
-		}
+		}*/
 		this.userID = message.getUserID();
 		this.brokerAddress = message.getBrokerAddress();
 		try {

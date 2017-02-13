@@ -50,9 +50,7 @@ public class Main {
 				id = tempId;
 				IInfrastructureNodeImpl node = new InfrastructureNodeImpl("id"+id);
 				lat = s.nextDouble();
-				System.out.println("> Latitude is " + lat);
 				longit = s.nextDouble();
-				System.out.println("> Longitude is " + longit);
 				node.setCoordinates(new Coordinates(lat, longit));
 				s.nextLine();
 				tempId = s.nextInt();
@@ -77,10 +75,9 @@ public class Main {
 			e.printStackTrace();
 		}
 		server.setGraph();
-		server.printNodes();
 		
 		MainView view = new MainView(new HashSet<>(nodes));
-		UserDevice user = new UserDevice(nodes.get(0), nodes.get(2));
+		UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
 		user.run();
 		
 		

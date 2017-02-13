@@ -140,8 +140,8 @@ public class JSONMessagingUtils {
 	
 	public static IRequestPathMsg getRequestPathMsgFromString(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
-		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(FIRST_NODE));
-		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeFromJSONObject(obj.getJSONObject(SECOND_NODE));
+		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeWithCoordinatesFromJSONObject(obj.getJSONObject(FIRST_NODE));
+		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeWithCoordinatesFromJSONObject(obj.getJSONObject(SECOND_NODE));
 		IRequestPathMsg msg = new RequestPathMsg(obj.getString(MSG_ID),firstNode, secondNode);
 		return msg;
 	}

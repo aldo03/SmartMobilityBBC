@@ -20,10 +20,10 @@ public class TemperatureHumidityThread extends Thread {
 	public void run() {
 		while (true) {
 			this.sensor.senseTemperatureAndHumidity();
-			System.out.println("humidity:" + this.sensor.getHumidity());
+			//System.out.println("humidity:" + this.sensor.getHumidity());
 			if (this.observer != null)
 				this.observer.setHumidity(this.sensor.getHumidity());
-			System.out.println("temperature:" + this.sensor.getTemperature());
+			//System.out.println("temperature:" + this.sensor.getTemperature());
 			if (this.observer != null)
 				this.observer.setTemperature(this.sensor.getTemperature());
 			try {

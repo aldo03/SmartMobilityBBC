@@ -126,7 +126,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			List<String> newTimes = new ArrayList<String>();
 			for(Integer i : times){
 				LocalDateTime dateTime = LocalDateTime.ofEpochSecond(i, 0, ZoneOffset.UTC);
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm,a", Locale.ENGLISH);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm:ss,a", Locale.ENGLISH);
 				String formattedDate = dateTime.format(formatter);
 				newTimes.add(formattedDate);
 			}
