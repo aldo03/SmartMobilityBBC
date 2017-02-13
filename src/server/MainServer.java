@@ -229,7 +229,7 @@ public class MainServer {
 	}
 
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
-		return "localhost";
+		return "192.168.1.104";
 	}
 
 	private String generateUserID() {
