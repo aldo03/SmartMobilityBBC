@@ -198,6 +198,22 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     	return table;
     }
     
+    private JTable createTableStrings(Map<String, List<String>> tableContent){
+    	int max = 1;
+    	for (String l : tableContent.keySet()){
+    		if(tableContent.get(l).size() >= max)
+    			max = tableContent.get(l).size()+1;
+    	}
+    	System.out.println("MAX"+max);
+    	JTable table = new JTable(tableContent.keySet().size(), max);
+
+    	System.out.println("> Size:" + tableContent.keySet().size());
+    	if(tableContent.keySet().size() > 0){
+    		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
+    	}
+    	return table;
+    }
     
     
     private void fillTable(Map<String, List<Integer>> tableContent, boolean travelTimes, JTable table){ 		
@@ -265,8 +281,11 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.fillTable(MongoDBUtils.getTimeTravels(this.nodeId), true, t1);
 			this.sp1.repaint();
 		} else if(e.getSource().equals(this.refreshExpectedVehicles)){
+			this.expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
+			JTable v = this.createTableStrings(this.getExpectedVehicleTimes(this.expectedVehicles));
+			sp2.add(v);
 			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), t2);
-			this.sp2.repaint();
+			this.sp2.setViewportView(v);
 		} else if(e.getSource().equals(this.refreshCurrentTimes)){
 			System.out.println(MongoDBUtils.getCurrentTimes(this.nodeId).get("id3").size());	
 			this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);

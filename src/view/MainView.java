@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.List;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -25,10 +26,10 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private JComboBox<String> nodes;
-	private Set<IInfrastructureNode> nodesSet;
+	private List<IInfrastructureNode> nodesSet;
 	private JButton open;
 	
-	public MainView(Set<IInfrastructureNode> nodes2){
+	public MainView(List<IInfrastructureNode> nodes2){
 		this.panel = new JPanel();
 		this.nodesSet = nodes2;
 		initGUI();
