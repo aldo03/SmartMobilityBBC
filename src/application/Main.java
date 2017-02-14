@@ -38,7 +38,7 @@ public class Main {
 		MongoDBUtils.initDb();
 		List<IInfrastructureNode> nodes = new ArrayList<>();
 		try {
-			Scanner s = new Scanner(new FileReader("graphCommas.txt"));
+			Scanner s = new Scanner(new FileReader("graph.txt"));
 			int id;
 			int tempId = -1;
 			double lat;

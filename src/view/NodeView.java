@@ -284,10 +284,9 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 			this.expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
 			JTable v = this.createTableStrings(this.getExpectedVehicleTimes(this.expectedVehicles));
 			sp2.add(v);
-			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), t2);
+			this.fillTable(this.getExpectedVehicleTimes(MongoDBUtils.getExpectedVehicles(this.nodeId)), v);
 			this.sp2.setViewportView(v);
-		} else if(e.getSource().equals(this.refreshCurrentTimes)){
-			System.out.println(MongoDBUtils.getCurrentTimes(this.nodeId).get("id3").size());	
+		} else if(e.getSource().equals(this.refreshCurrentTimes)){	
 			this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
 			JTable t = this.createTable(currentTimes);	
 			sp3.add(t);
