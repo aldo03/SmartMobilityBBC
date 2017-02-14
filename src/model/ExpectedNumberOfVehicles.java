@@ -31,12 +31,14 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 		int rangeMin = futureTime-RANGE/2;
 		int rangeMax = futureTime+RANGE/2;
 		int vehiclesCount = 0;
+		if(listOfVehicles!=null){
 		for(Integer i : listOfVehicles){       
 			if(i>=rangeMin&&i<=rangeMax){         //if a vehicle is within the range the counter is incremented
 				vehiclesCount++;
 			}else if(i>rangeMax){
 				break;
 			}
+		}
 		}
 		return vehiclesCount;
 	}

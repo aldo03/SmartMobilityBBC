@@ -60,7 +60,7 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 		int range = numOfVehicles/RANGE;
 		
 		if(range<times.length){
-			if(times[range]<=travelTime){
+			if(times[range]>=travelTime){
 				times[range] = travelTime;
 				MongoDBUtils.setTravelTime(this.nodeId, nodeId, range, travelTime);
 				for(int i=range-1; i>=0;i--){
@@ -70,7 +70,7 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 					times[i]=travelTime;
 					MongoDBUtils.setTravelTime(this.nodeId, nodeId, i, travelTime);
 				}
-			} else if(times[range]>travelTime){
+			} else if(times[range]<travelTime){
 				times[range] = travelTime;
 				MongoDBUtils.setTravelTime(this.nodeId, nodeId, range, travelTime);
 				for(int i=range+1; i<times.length;i++){

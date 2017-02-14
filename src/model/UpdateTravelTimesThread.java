@@ -8,7 +8,7 @@ import model.interfaces.ITravelTimesByNumberOfVehicles;
 
 public class UpdateTravelTimesThread extends Thread {
 
-	private static final int RANGE = 300;  // same RANGE as the one set in
+	private static final int RANGE = 120000;  // same RANGE as the one set in
 											// ExpectedNumberOfVehicles.
 											// the sampling frequency is the
 											// same
@@ -30,7 +30,7 @@ public class UpdateTravelTimesThread extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				Thread.sleep(RANGE*30);
+				Thread.sleep(RANGE);
 				for (String id : this.nodeIds) {
 					//System.out.println("[UpdateTravelTimesThread] id: "+id);
 					int avgTime = this.curTimes.getAverageTime(id);

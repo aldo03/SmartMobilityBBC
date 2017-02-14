@@ -12,19 +12,27 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import edu.asu.emit.qyan.alg.control.YenTopKShortestPathsAlg;
 import edu.asu.emit.qyan.alg.model.Graph;
 import edu.asu.emit.qyan.alg.model.Path;
 import edu.asu.emit.qyan.alg.model.Vertex;
 import infrastructure.InfrastructureDevice;
 import model.interfaces.IPair;
+import model.interfaces.msg.IResponsePathMsg;
+import model.msg.ResponsePathMsg;
 import server.MainServer;
 import model.Coordinates;
 import model.InfrastructureNodeImpl;
+import model.NodePath;
 import model.Pair;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
+import model.interfaces.INodePath;
 import user.UserDevice;
+import utils.json.JSONMessagingUtils;
+import utils.messaging.MessagingUtils;
 import utils.mongodb.MongoDBUtils;
 import view.MainView;
 import view.NodeView;
@@ -76,11 +84,18 @@ public class Main {
 		}
 		server.setGraph();
 		
-		MainView view = new MainView(nodes);
 		/*UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
-		user.run();*/
-		
-		
+		user.start();*/
+		INodePath path1 = new NodePath(Arrays.asList(nodes.get(22),nodes.get(23),nodes.get(32),nodes.get(33),
+				nodes.get(34),nodes.get(60),nodes.get(67),nodes.get(68),nodes.get(69),nodes.get(70),nodes.get(80)));
+		List<Integer> prefixedTimesForPath1 = Arrays.asList(10,10,17,17,30,10,17,17,17,10);
+		List<UserDevice> users = new ArrayList<>();
+		for(int i =0; i<50; i++){
+			IResponsePathMsg msg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, "User-Device-"+i,Arrays.asList(path1), "localhost");
+			UserDevice user = new UserDevice(nodes.get(23), nodes.get(81), prefixedTimesForPath1, JSONMessagingUtils.getStringfromResponsePathMsg(msg));
+			users.add(user);
+		}
+		MainView view = new MainView(nodes, users);
 		/*MainServer server = new MainServer();
 		UserDevice device1 = new UserDevice();
 		UserDevice device2 = new UserDevice();

@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
+import user.UserDevice;
 
 public class MainView extends JFrame implements WindowListener, ActionListener {
 	/**
@@ -28,10 +29,13 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private JComboBox<String> nodes;
 	private List<IInfrastructureNode> nodesSet;
 	private JButton open;
+	private JButton startSimulation;
+	private List<UserDevice> usersList;
 	
-	public MainView(List<IInfrastructureNode> nodes2){
+	public MainView(List<IInfrastructureNode> nodes2, List<UserDevice> usersList){
 		this.panel = new JPanel();
 		this.nodesSet = nodes2;
+		this.usersList = usersList;
 		initGUI();
 		initPanel();
 		this.addWindowListener(this);
@@ -46,11 +50,14 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		}
 		this.open = new JButton(" View info ");
 		this.open.addActionListener(this);
+		this.startSimulation = new JButton(" START SIMULATION ");
+		this.startSimulation.addActionListener(this);
 		this.setLayout(new FlowLayout());
 		this.panel.setOpaque(false);
 		this.panel.add(new JLabel("Select the Node you want info on "));
 		this.panel.add(this.nodes);
 		this.panel.add(this.open);
+		this.panel.add(this.startSimulation);
 	}
 	
 	private void initGUI(){
@@ -108,6 +115,10 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		if(e.getSource().equals(open)){
 			NodeView nv = new NodeView(this.nodes.getSelectedItem().toString());
 			nv.setVisible(true);
+		} else if(e.getSource().equals(startSimulation)){
+			for(UserDevice user : usersList){
+				user.start();
+			}
 		}
 	}
 

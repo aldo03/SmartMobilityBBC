@@ -54,6 +54,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private int currentIndex;
 	private long timerValue;
 	private List<Integer> prefixedTimes;
+	private boolean testLearning;
+	private String respMsgTest;
 
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
@@ -62,6 +64,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.pathsWithTravelID = new ArrayList<>();
 		this.start = start;
 		this.end = end;
+		this.testLearning = false;
 	}
 	
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes){
@@ -72,6 +75,19 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.start = start;
 		this.end = end;
 		this.prefixedTimes = prefixedTimes;
+		this.testLearning = false;
+	}
+	
+	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, String msg){
+		this.travelID = 0;
+		this.userID = "newuser";
+		this.chosenPath = new NodePath(new ArrayList<>());
+		this.pathsWithTravelID = new ArrayList<>();
+		this.start = start;
+		this.end = end;
+		this.prefixedTimes = prefixedTimes;
+		this.testLearning = true;
+		this.respMsgTest = msg;
 	}
 	
 	private Channel initChannel() throws IOException, TimeoutException {
@@ -87,7 +103,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 	public void run() {
 		this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
 		this.currentIndex = 0;
-		this.requestPaths(start, end);
+		if(this.testLearning){
+			try {
+				this.handleResponsePathMsg(this.respMsgTest);
+			} catch (JSONException | IOException | TimeoutException e) {
+				e.printStackTrace();
+			}
+		} else{
+			this.requestPaths(start, end);
+		}
+		
 	}
 	
 	private void startReceiving() throws IOException, TimeoutException {
@@ -275,11 +300,11 @@ public class UserDevice extends Thread implements IGPSObserver {
 				chosenPath.getPathNodes().get(this.currentIndex), this.chosenPath.getPathNodes().get(this.currentIndex + 1), time);
 		String travelTimeAck = JSONMessagingUtils.getStringfromTravelTimeAckMsg(msg);
 		MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(this.currentIndex).getNodeID(), travelTimeAck);
+		this.currentIndex++;
 	}
 
 	@Override
 	public void notifyGps(ICoordinates coordinates) {		//we always check the next node. If the signal is lost, the range is too small.
-		this.chosenPath.printPath();
 		if(this.chosenPath.getPathNodes().get(this.currentIndex+1).getCoordinates().isCloseEnough(coordinates)){
 			int time = (int) (System.currentTimeMillis()-this.timerValue);
 			time/=1000;

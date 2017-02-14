@@ -131,7 +131,7 @@ public class JSONMessagingUtils {
 		List<INodePath> list= new ArrayList<>();
 		JSONArray array = obj.getJSONArray(PATH_LIST);
 		for(int i=0; i<array.length(); i++){
-			INodePath path = JSONNodePath.getNodePathfromJSONArray(array.getJSONArray(i));
+			INodePath path = JSONNodePath.getNodePathWithCoordinatesfromJSONArray(array.getJSONArray(i));
 			list.add(path);
 		}
 		IResponsePathMsg msg = new ResponsePathMsg(obj.getString(MSG_ID),obj.getString(USER_ID), list, obj.getString(BROKER_ADDR));
