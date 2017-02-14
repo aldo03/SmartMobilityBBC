@@ -48,11 +48,12 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 		listOfVehicles.add((int) (currentTimeSeconds+time));
 		MongoDBUtils.addExpectedVehicle(this.nodeId, nodeId, (int) (currentTimeSeconds+time));
 		Collections.sort(listOfVehicles);
-		for(Integer i : listOfVehicles){       //every "non fresh" information is removed
-			if(i<currentTimeSeconds){
+		for(int i = listOfVehicles.size()-1; i>=0; i--){       //every "non fresh" information is removed
+			if(listOfVehicles.get(i)<currentTimeSeconds){
 				listOfVehicles.remove(i);
 			}
 		}
+		MongoDBUtils.removeExpectedVehicles(this.nodeId, nodeId, currentTimeSeconds);
 	}
 
 

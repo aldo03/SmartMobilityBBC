@@ -77,8 +77,8 @@ public class Main {
 		server.setGraph();
 		
 		MainView view = new MainView(new HashSet<>(nodes));
-		UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
-		user.run();
+		/*UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
+		user.run();*/
 		
 		
 		/*MainServer server = new MainServer();
