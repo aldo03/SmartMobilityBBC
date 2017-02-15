@@ -90,7 +90,7 @@ public class Main {
 				nodes.get(34),nodes.get(60),nodes.get(67),nodes.get(68),nodes.get(69),nodes.get(70),nodes.get(80)));
 		List<Integer> prefixedTimesForPath1 = Arrays.asList(10,10,17,17,30,10,17,17,17,10);
 		List<UserDevice> users = new ArrayList<>();
-		for(int i =0; i<50; i++){
+		for(int i =0; i<5; i++){
 			IResponsePathMsg msg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, "User-Device-"+i,Arrays.asList(path1), "localhost");
 			UserDevice user = new UserDevice(nodes.get(23), nodes.get(81), prefixedTimesForPath1, JSONMessagingUtils.getStringfromResponsePathMsg(msg),0);
 			users.add(user);

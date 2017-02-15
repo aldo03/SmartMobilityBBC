@@ -44,7 +44,6 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private List<IInfrastructureNode> nodesSet;
 	private JButton open;
 	private JButton startSimulation;
-	private JButton viewUsersList;
 	private List<UserDevice> usersList;
 	private JTextField textPath;
 	private JTextField textPrefixedTimes;
@@ -52,6 +51,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private JTextField textInitialDelay;
 	private JTextField textDelayBetweenUsers;
 	private JButton addUsers;
+	private JButton viewUsersList;
 	private int usersCount;
 	
 	public MainView(List<IInfrastructureNode> nodes2, List<UserDevice> usersList){
@@ -64,6 +64,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		initPanel();
 		this.addWindowListener(this);
 		this.add(this.panel,BorderLayout.NORTH);
+		this.add(this.simulationPanel, BorderLayout.CENTER);
 		this.setVisible(true);
 	}
 	
@@ -76,7 +77,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		this.open.addActionListener(this);
 		this.startSimulation = new JButton(" START SIMULATION ");
 		this.startSimulation.addActionListener(this);
-		this.viewUsersList = new JButton(" View Users ");
+		this.viewUsersList = new JButton(" VIEW USERS ");
 		this.viewUsersList.addActionListener(this);
 		this.setLayout(new BorderLayout());
 		this.panel.setOpaque(false);
@@ -84,7 +85,26 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		this.panel.add(this.nodes);
 		this.panel.add(this.open);
 		this.panel.add(this.startSimulation);
-		this.panel.add(this.viewUsersList);
+		
+		this.textPath = new JTextField(15);
+		this.textPrefixedTimes = new JTextField(15);
+		this.textNumUsers = new JTextField(3);
+		this.textInitialDelay = new JTextField(3);
+		this.textDelayBetweenUsers = new JTextField(3);
+		this.addUsers = new JButton("ADD USERS");
+		this.addUsers.addActionListener(this);
+		this.simulationPanel.add(new JLabel("Path:"));
+		this.simulationPanel.add(this.textPath);
+		this.simulationPanel.add(new JLabel("Prefixed Times:"));
+		this.simulationPanel.add(this.textPrefixedTimes);
+		this.simulationPanel.add(new JLabel("Num of Users:"));
+		this.simulationPanel.add(this.textNumUsers);
+		this.simulationPanel.add(new JLabel("Initial Delay:"));
+		this.simulationPanel.add(this.textInitialDelay);
+		this.simulationPanel.add(new JLabel("Delay Between Users:"));
+		this.simulationPanel.add(this.textDelayBetweenUsers);
+		this.simulationPanel.add(this.addUsers);
+		this.simulationPanel.add(this.viewUsersList);
 	}
 	
 	private void initGUI(){
@@ -147,9 +167,46 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 				user.start();
 			}
 			usersList.clear();
+		} else if(e.getSource().equals(addUsers)){
+			List<IInfrastructureNode> listNodes = new ArrayList<>();
+			String path = this.textPath.getText();
+			Scanner s = new Scanner(path);
+			while(s.hasNextInt()){
+				int i = s.nextInt();
+				listNodes.add(this.nodesSet.get(i-1));
+			}
+			s.close();
+			INodePath nodePath = new NodePath(listNodes);
+			
+			List<Integer> times = new ArrayList<>();
+			String prefTimes = this.textPrefixedTimes.getText();
+			Scanner s1 = new Scanner(prefTimes);
+			while(s1.hasNextInt()){
+				int i = s1.nextInt();
+				times.add(i);
+			}
+			s1.close();
+			int numUsers = Integer.parseInt(this.textNumUsers.getText());
+			int inDelay = Integer.parseInt(this.textInitialDelay.getText());
+			int delayBetween = Integer.parseInt(this.textDelayBetweenUsers.getText());
+			int tempDelay = inDelay;
+			for(int i =0; i<numUsers;i++){
+				IResponsePathMsg msg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, "User-Device-"+this.usersCount,Arrays.asList(nodePath), "localhost");
+				UserDevice user;
+				try {
+					user = new UserDevice(nodePath.getPathNodes().get(0), nodePath.getPathNodes().get(nodePath.getPathNodes().size()-1), 
+							times, JSONMessagingUtils.getStringfromResponsePathMsg(msg),tempDelay);
+					this.usersList.add(user);
+					tempDelay+=delayBetween;
+					this.usersCount++;
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
+			}
 		} else if(e.getSource().equals(viewUsersList)){
-			ListView v = new ListView(this.usersList);
-		}
+		      ListView v = new ListView(this.usersList);
+		      v.setVisible(true);
+	    }
 	}
 
 }

@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -29,7 +31,6 @@ public class ListView extends JFrame {
 		initGUI();
 		initPanel();
 		this.add(this.panel);
-		this.setVisible(true);
 	}
 	
 	private void initPanel(){
@@ -49,17 +50,14 @@ public class ListView extends JFrame {
 	
 	private void initGUI(){
 		this.setResizable(true);
-		Dimension d = new Dimension(300,400);
+		Dimension d = new Dimension(1000,400);
 		this.setMaximumSize(d);
 		this.setSize(d);
 		this.setTitle("List of Users");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation( (int)((dim.width) / 2 - (d.getWidth() / 2)) ,
 				(int)((dim.height) / 2 - (d.getHeight() / 2)));
 	}
-
-	
 
 }

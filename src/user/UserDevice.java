@@ -363,6 +363,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 		for(int i : this.prefixedTimes){
 			stringTimes+=i+"  ";
 		}
-		return this.respMsgTest+". PREFIXED TIMES: "+stringTimes+"INITIAL DELAY: "+this.startingDelay;
+		String m="";
+		try {
+			IResponsePathMsg r = JSONMessagingUtils.getResponsePathMsgFromString(respMsgTest);
+			m+="User ID: "+r.getUserID()+" - Broker Addr: "+r.getBrokerAddress()+" -  Path: ";
+			for(IInfrastructureNode n : r.getPaths().get(0).getPathNodes()){
+				m+=n.getNodeID()+" - ";
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return m+"- Prefixed Times: "+stringTimes+" - Initial Delay: "+this.startingDelay;
 	}
 }
