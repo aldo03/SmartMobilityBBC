@@ -56,6 +56,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private List<Integer> prefixedTimes;
 	private boolean testLearning;
 	private String respMsgTest;
+	private int startingDelay;
 
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
@@ -65,9 +66,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.start = start;
 		this.end = end;
 		this.testLearning = false;
+		this.startingDelay = 0;
 	}
 	
-	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes){
+	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, int startingDelay){
 		this.travelID = 0;
 		this.userID = "newuser";
 		this.chosenPath = new NodePath(new ArrayList<>());
@@ -76,9 +78,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.end = end;
 		this.prefixedTimes = prefixedTimes;
 		this.testLearning = false;
+		this.startingDelay = startingDelay;
 	}
 	
-	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, String msg){
+	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, String msg, int startingDelay){
 		this.travelID = 0;
 		this.userID = "newuser";
 		this.chosenPath = new NodePath(new ArrayList<>());
@@ -88,6 +91,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.prefixedTimes = prefixedTimes;
 		this.testLearning = true;
 		this.respMsgTest = msg;
+		this.startingDelay = startingDelay;
 	}
 	
 	private Channel initChannel() throws IOException, TimeoutException {
@@ -101,6 +105,11 @@ public class UserDevice extends Thread implements IGPSObserver {
 
 	@Override
 	public void run() {
+		try {
+			Thread.sleep(this.startingDelay*1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
 		this.currentIndex = 0;
 		if(this.testLearning){
@@ -348,5 +357,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public String toString(){
+		String stringTimes="";
+		for(int i : this.prefixedTimes){
+			
+		}
+		return this.respMsgTest+". PREFIXED TIMES:";
+	}
 }

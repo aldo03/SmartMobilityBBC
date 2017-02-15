@@ -92,7 +92,7 @@ public class Main {
 		List<UserDevice> users = new ArrayList<>();
 		for(int i =0; i<50; i++){
 			IResponsePathMsg msg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, "User-Device-"+i,Arrays.asList(path1), "localhost");
-			UserDevice user = new UserDevice(nodes.get(23), nodes.get(81), prefixedTimesForPath1, JSONMessagingUtils.getStringfromResponsePathMsg(msg));
+			UserDevice user = new UserDevice(nodes.get(23), nodes.get(81), prefixedTimesForPath1, JSONMessagingUtils.getStringfromResponsePathMsg(msg),0);
 			users.add(user);
 		}
 		MainView view = new MainView(nodes, users);

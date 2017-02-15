@@ -119,6 +119,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 			for(UserDevice user : usersList){
 				user.start();
 			}
+			usersList.clear();
 		}
 	}
 
