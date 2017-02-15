@@ -361,8 +361,8 @@ public class UserDevice extends Thread implements IGPSObserver {
 	public String toString(){
 		String stringTimes="";
 		for(int i : this.prefixedTimes){
-			
+			stringTimes+=i+"  ";
 		}
-		return this.respMsgTest+". PREFIXED TIMES:";
+		return this.respMsgTest+". PREFIXED TIMES: "+stringTimes+"INITIAL DELAY: "+this.startingDelay;
 	}
 }
