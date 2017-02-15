@@ -13,14 +13,16 @@ import utils.mongodb.MongoDBUtils;
 public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehicles {
 	private static final int RANGE = 5;
 	private static final int ARRAY_LENGTH = 200;
+	private static final int MAX_VARIATION_PERCENTAGE = 8;     //Variations over 25% of the old value are not allowed
 	private String nodeId;
 	
-	private Map<String, int[]> travelTimes;
+	private Map<String, Integer[]> travelTimes;
+	private int samplingCounter;
 	
 	public TravelTimesByNumberOfVehicles(String nodeId){
 		this.travelTimes = new HashMap<>();
 		this.nodeId = nodeId;
-		MongoDBUtils.initTimes(nodeId);
+		//MongoDBUtils.initTimes(nodeId);
 	}
 	
 	
@@ -28,7 +30,7 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 	@Override
 	public int getTravelTime(String nodeId, int numOfVehicles) {
 		int time = 0;
-		int[] l = this.travelTimes.get(nodeId);
+		Integer[] l = this.travelTimes.get(nodeId);
 		if(l.length<numOfVehicles/RANGE){
 			time = l[l.length-1];
 		} else{
@@ -41,24 +43,35 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 
 	@Override
 	public void initTravelTimes(String nodeId, int defaultValue) {
-		int[] times = new int[ARRAY_LENGTH];
+		
+		/*Integer[] times = new Integer[ARRAY_LENGTH];
 		List<Integer> list = new ArrayList<>();
 		for(int i=0; i<times.length;i++){
 			times[i] = defaultValue;
 			list.add(defaultValue);
-		}
+		}*/
+		Integer[] times = new Integer[ARRAY_LENGTH];
+		MongoDBUtils.getTimeTravels(this.nodeId).get(nodeId).toArray(times);
 		this.travelTimes.put(nodeId, times);
-		MongoDBUtils.initTravelTimes(this.nodeId, nodeId, list);
+		//MongoDBUtils.initTravelTimes(this.nodeId, nodeId, list);
 	}
 
 
 	//the travel time for a certain amount of vehicles is set. The near values are updated in order to make
 	//them consistent with the new value
 	@Override
-	public void setTravelTime(String nodeId, int numOfVehicles, int travelTime) {
-		int[] times = this.travelTimes.get(nodeId);
+	public void setTravelTime(String nodeId, int numOfVehicles, int time) {
+		Integer[] times = this.travelTimes.get(nodeId);
 		int range = numOfVehicles/RANGE;
-		
+		int oldVal= times[range];
+		int travelTime = Math.floorDiv(oldVal+time, 2);
+		if(Math.abs(travelTime-oldVal)>oldVal/MAX_VARIATION_PERCENTAGE){
+			if(travelTime-oldVal<0){
+				travelTime = oldVal - oldVal/MAX_VARIATION_PERCENTAGE;
+			} else{
+				travelTime = oldVal + oldVal/MAX_VARIATION_PERCENTAGE;
+			}
+		}
 		if(range<times.length){
 			if(times[range]>=travelTime){
 				times[range] = travelTime;

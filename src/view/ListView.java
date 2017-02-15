@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import user.UserDevice;
 
@@ -30,7 +31,7 @@ public class ListView extends JFrame {
 		this.users = users;
 		initGUI();
 		initPanel();
-		this.add(this.panel);
+		this.add(new JScrollPane(this.panel));
 	}
 	
 	private void initPanel(){

@@ -86,15 +86,15 @@ public class Main {
 		
 		/*UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
 		user.start();*/
-		INodePath path1 = new NodePath(Arrays.asList(nodes.get(22),nodes.get(23),nodes.get(32),nodes.get(33),
+		/*INodePath path1 = new NodePath(Arrays.asList(nodes.get(22),nodes.get(23),nodes.get(32),nodes.get(33),
 				nodes.get(34),nodes.get(60),nodes.get(67),nodes.get(68),nodes.get(69),nodes.get(70),nodes.get(80)));
-		List<Integer> prefixedTimesForPath1 = Arrays.asList(10,10,17,17,30,10,17,17,17,10);
+		List<Integer> prefixedTimesForPath1 = Arrays.asList(10,10,17,17,30,10,17,17,17,10);*/
 		List<UserDevice> users = new ArrayList<>();
-		for(int i =0; i<5; i++){
+		/*for(int i =0; i<5; i++){ 
 			IResponsePathMsg msg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, "User-Device-"+i,Arrays.asList(path1), "localhost");
 			UserDevice user = new UserDevice(nodes.get(23), nodes.get(81), prefixedTimesForPath1, JSONMessagingUtils.getStringfromResponsePathMsg(msg),0);
 			users.add(user);
-		}
+		}*/
 		MainView view = new MainView(nodes, users);
 		/*MainServer server = new MainServer();
 		UserDevice device1 = new UserDevice();

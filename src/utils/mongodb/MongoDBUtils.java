@@ -31,8 +31,8 @@ public class MongoDBUtils {
 		MongoClient mongoClient = new MongoClient( "localhost" );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		db.drop();
-		db = mongoClient.getDatabase(DB_TIME_TRAVELS);
-		db.drop();
+		/*db = mongoClient.getDatabase(DB_TIME_TRAVELS);
+		db.drop();*/
 		db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		db.drop();
 		db = mongoClient.getDatabase(DB_TEMPHUM);
@@ -223,7 +223,7 @@ public class MongoDBUtils {
 		while(cursor.hasNext()){
 			Document d = cursor.next();
 			String id = d.getString("_id");
-			System.out.println(id);
+			//System.out.println(id);
 			List<Integer> list = (List<Integer>) d.get("times");
 			curTimes.put(id, list);
 		}
