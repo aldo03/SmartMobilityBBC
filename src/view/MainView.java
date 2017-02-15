@@ -30,6 +30,7 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 	private List<IInfrastructureNode> nodesSet;
 	private JButton open;
 	private JButton startSimulation;
+	private JButton viewUsersList;
 	private List<UserDevice> usersList;
 	
 	public MainView(List<IInfrastructureNode> nodes2, List<UserDevice> usersList){
@@ -52,12 +53,15 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		this.open.addActionListener(this);
 		this.startSimulation = new JButton(" START SIMULATION ");
 		this.startSimulation.addActionListener(this);
+		this.viewUsersList = new JButton(" View Users ");
+		this.viewUsersList.addActionListener(this);
 		this.setLayout(new FlowLayout());
 		this.panel.setOpaque(false);
 		this.panel.add(new JLabel("Select the Node you want info on "));
 		this.panel.add(this.nodes);
 		this.panel.add(this.open);
 		this.panel.add(this.startSimulation);
+		this.panel.add(this.viewUsersList);
 	}
 	
 	private void initGUI(){
@@ -120,6 +124,8 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 				user.start();
 			}
 			usersList.clear();
+		} else if(e.getSource().equals(viewUsersList)){
+			ListView v = new ListView(this.usersList);
 		}
 	}
 

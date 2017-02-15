@@ -54,7 +54,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		Dimension d = new Dimension(800,600);
 		this.setMaximumSize(d);
 		this.setSize(d);
-		this.setTitle("Main view");	
+		this.setTitle(this.nodeId + " view");	
 		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation( (int)((dim.width) / 2 - (d.getWidth() / 2)) ,
