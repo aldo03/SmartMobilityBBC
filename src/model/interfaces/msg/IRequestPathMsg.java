@@ -7,7 +7,7 @@ import model.interfaces.IInfrastructureNode;
  * @author BBC
  *
  */
-public interface IRequestPathMsg extends IMobilityMsg {
+public interface IRequestPathMsg extends IUserMobilityMsg {
 	
 	/**
 	 * gets the starting node of the path

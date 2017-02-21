@@ -172,7 +172,7 @@ public class UserDevice extends Thread implements IGPSObserver {
 				e.printStackTrace();
 			}
 		});*/
-		IRequestPathMsg requestMsg = new RequestPathMsg(MessagingUtils.REQUEST_PATH, this.start, this.end);
+		IRequestPathMsg requestMsg = new RequestPathMsg(MessagingUtils.REQUEST_PATH, this.start, this.end, this.userID);
 		try {
 			String requestPathString = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
 			this.handleResponsePathMsg(HttpUtils.POST(requestPathString));

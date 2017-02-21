@@ -71,6 +71,7 @@ public class JSONMessagingUtils {
 		obj.put(MSG_ID, msg.getMsgID());
 		obj.put(FIRST_NODE, new JSONInfrastructureNode(msg.getStartingNode()));
 		obj.put(SECOND_NODE, new JSONInfrastructureNode(msg.getEndingNode()));
+		obj.put(USER_ID, msg.getUserID());
 		return obj.toString();	
 	}
 	
@@ -142,7 +143,7 @@ public class JSONMessagingUtils {
 		JSONObject obj = new JSONObject(s);
 		IInfrastructureNode firstNode = JSONInfrastructureNode.getInfrastructureNodeWithCoordinatesFromJSONObject(obj.getJSONObject(FIRST_NODE));
 		IInfrastructureNode secondNode = JSONInfrastructureNode.getInfrastructureNodeWithCoordinatesFromJSONObject(obj.getJSONObject(SECOND_NODE));
-		IRequestPathMsg msg = new RequestPathMsg(obj.getString(MSG_ID),firstNode, secondNode);
+		IRequestPathMsg msg = new RequestPathMsg(obj.getString(MSG_ID),firstNode, secondNode,obj.getString(USER_ID));
 		return msg;
 	}
 	

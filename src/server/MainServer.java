@@ -46,7 +46,7 @@ import utils.messaging.MessagingUtils;
 public class MainServer {
 
 	private final static String USER_ID = "User-Device-";
-	private final static Integer K_SHORTEST_PATHS = 5;
+	private final static Integer K_SHORTEST_PATHS = 10;
 	private Graph graph;
 	private Set<IInfrastructureNodeImpl> nodesSet;
 	private Map<String, IInfrastructureNodeImpl> nodeMapId;
@@ -56,7 +56,7 @@ public class MainServer {
 		this.graph = new Graph();
 		this.nodesSet = new HashSet<>();
 		this.nodeMapId = new HashMap<>();
-		this.userSeed = 0;
+		this.userSeed = 10000;
 		this.initVertx();
 	}
 
@@ -199,7 +199,7 @@ public class MainServer {
 			node.printPath();
 		}*/
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
-		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(),
+		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(requestPathMsg.getUserID()),
 				pathList, brokerAddress);
 		String response = JSONMessagingUtils.getStringfromResponsePathMsg(responsePathMsg);
 		t.sendResponseHeaders(200, response.length());
@@ -233,8 +233,12 @@ public class MainServer {
 		return "192.168.43.240";
 	}
 
-	private String generateUserID() {
-		return USER_ID + this.userSeed++;
+	private String generateUserID(String string) {
+		if(string.equals("newuser")){
+			return USER_ID + this.userSeed++;
+		} else{
+			return string;
+		}
 	}
 
 	/**

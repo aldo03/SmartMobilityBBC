@@ -37,6 +37,7 @@ public class MongoDBUtils {
 		db.drop();
 		db = mongoClient.getDatabase(DB_TEMPHUM);
 		db.drop();
+		mongoClient.close();
 	}
 	
 	public static void initCurrentTime(String nodeId){
@@ -187,7 +188,7 @@ public class MongoDBUtils {
 		while(cursor.hasNext()){
 			Document d = cursor.next();
 			String id = d.getString("_id");
-			System.out.println(id);
+			//System.out.println(id);
 			List<Integer> list = (List<Integer>) d.get("times");
 			curTimes.put(id, list);
 		}
@@ -205,7 +206,7 @@ public class MongoDBUtils {
 		while(cursor.hasNext()){
 			Document d = cursor.next();
 			String id = d.getString("_id");
-			System.out.println(id);
+			//System.out.println(id);
 			List<Integer> list = (List<Integer>) d.get("vehicles");
 			curTimes.put(id, list);
 		}

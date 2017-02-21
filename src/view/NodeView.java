@@ -95,14 +95,12 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
         this.card4.setLayout(new FlowLayout(FlowLayout.CENTER, 200, 30));
         
 		this.travelTimes = MongoDBUtils.getTimeTravels(this.nodeId);
-		System.out.println("Creating Travel times table");
 		this.t1 = this.createTable(travelTimes, true, card1, "These are the future Travel Times from node " + this.nodeId + " to its near nodes", this.refreshTravelTimes);
 		this.fillTable(travelTimes, true, t1);
 		this.sp1 = new JScrollPane(t1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);	
 		this.sp1.repaint();
 		
 		this.expectedVehicles = MongoDBUtils.getExpectedVehicles(this.nodeId);
-		System.out.println("Creating Expected v table");
 		this.getExpectedVehicleTimes(expectedVehicles);
 		this.t2 = this.createTable(expectedVehicles, false, card2, "These are the scheduled times of Expected Vehicles", this.refreshExpectedVehicles);
 		this.expectedVehiclesTimes = this.getExpectedVehicleTimes(expectedVehicles);
@@ -111,7 +109,6 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 		this.sp2.repaint();
 		
 		this.currentTimes = MongoDBUtils.getCurrentTimes(this.nodeId);
-		System.out.println("Creating curr times table");
 		this.currTimesLbl = new JLabel("These are the lastest Travel times towards near nodes");
 		this.t3 = this.createTable(currentTimes, false, card3, this.currTimesLbl.getText(), this.refreshCurrentTimes );
 		this.fillTable(currentTimes, false, t3);
@@ -130,7 +127,6 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 				String formattedDate = dateTime.format(formatter);
 				newTimes.add(formattedDate);
 			}
-			System.out.println(entry.getKey());
 			expectedVehiclesTimes.put(entry.getKey(), newTimes);
 		}
 		return expectedVehiclesTimes;
@@ -161,11 +157,9 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     		if(tableContent.get(l).size() >= max)
     			max = tableContent.get(l).size()+1;
     	}
-    	System.out.println("MAX"+max);
     	JTable table = new JTable(tableContent.keySet().size(), max);
     	p.add(new JLabel(s));
     	p.add(b);
-    	System.out.println("> Size:" + tableContent.keySet().size());
     	if(tableContent.keySet().size() > 0){
     		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
@@ -187,10 +181,8 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     		if(tableContent.get(l).size() >= max)
     			max = tableContent.get(l).size()+1;
     	}
-    	System.out.println("MAX"+max);
     	JTable table = new JTable(tableContent.keySet().size(), max);
 
-    	System.out.println("> Size:" + tableContent.keySet().size());
     	if(tableContent.keySet().size() > 0){
     		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");
@@ -204,10 +196,8 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
     		if(tableContent.get(l).size() >= max)
     			max = tableContent.get(l).size()+1;
     	}
-    	System.out.println("MAX"+max);
     	JTable table = new JTable(tableContent.keySet().size(), max);
 
-    	System.out.println("> Size:" + tableContent.keySet().size());
     	if(tableContent.keySet().size() > 0){
     		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         	table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Node");

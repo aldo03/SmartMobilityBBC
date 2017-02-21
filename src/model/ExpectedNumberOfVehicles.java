@@ -40,6 +40,7 @@ public class ExpectedNumberOfVehicles implements IExpectedNumberOfVehicles {
 			}
 		}
 		}
+		//System.out.println("VEHICLES COUNT:      "+vehiclesCount);
 		return vehiclesCount;
 	}
 
