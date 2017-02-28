@@ -20,7 +20,7 @@ public class TemperatureHumiditySensor implements ITemperatureHumiditySensor{
 	        return;
 	    }
 
-	   GpioUtil.export(3, GpioUtil.DIRECTION_OUT);      
+	   GpioUtil.export(0, GpioUtil.DIRECTION_OUT);      
 	   this.temperature = 0;
 	   this.humidity = 0;
 	}
@@ -31,16 +31,16 @@ public class TemperatureHumiditySensor implements ITemperatureHumiditySensor{
 	   int j = 0;
 	   dht11_dat[0] = dht11_dat[1] = dht11_dat[2] = dht11_dat[3] = dht11_dat[4] = 0;
 
-	   Gpio.pinMode(3, Gpio.OUTPUT);
-	   Gpio.digitalWrite(3, Gpio.LOW);
+	   Gpio.pinMode(0, Gpio.OUTPUT);
+	   Gpio.digitalWrite(0, Gpio.LOW);
 	   Gpio.delay(18);
 
-	   Gpio.digitalWrite(3, Gpio.HIGH);        
-	   Gpio.pinMode(3, Gpio.INPUT);
+	   Gpio.digitalWrite(0, Gpio.HIGH);        
+	   Gpio.pinMode(0, Gpio.INPUT);
 
 	   for (int i = 0; i < MAXTIMINGS; i++) {
 	      int counter = 0;
-	      while (Gpio.digitalRead(3) == laststate) {
+	      while (Gpio.digitalRead(0) == laststate) {
 	          counter++;
 	          Gpio.delayMicroseconds(1);
 	          if (counter == 255) {
@@ -48,7 +48,7 @@ public class TemperatureHumiditySensor implements ITemperatureHumiditySensor{
 	          }
 	      }
 
-	      laststate = Gpio.digitalRead(3);
+	      laststate = Gpio.digitalRead(0);
 
 	      if (counter == 255) {
 	          break;

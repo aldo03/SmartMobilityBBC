@@ -73,8 +73,10 @@ public class Main {
 					}
 					else break;
 				}
-				InfrastructureDevice infDev = new InfrastructureDevice("id"+id,set,"localhost");
-				infDev.start();
+				if(id!=1){
+					InfrastructureDevice infDev = new InfrastructureDevice("id"+id,set,"localhost", true);
+					infDev.start();
+				}
 				server.setNewNode(node);
 				nodes.add(node);
 			}
@@ -83,7 +85,6 @@ public class Main {
 			e.printStackTrace();
 		}
 		server.setGraph();
-		
 		/*UserDevice user = new UserDevice(nodes.get(3), nodes.get(183), new ArrayList<>());
 		user.start();*/
 		/*INodePath path1 = new NodePath(Arrays.asList(nodes.get(22),nodes.get(23),nodes.get(32),nodes.get(33),

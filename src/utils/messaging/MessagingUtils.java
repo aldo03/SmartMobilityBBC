@@ -16,9 +16,7 @@ public class MessagingUtils {
 	public static int getIntId(String s) throws JSONException{
 		JSONObject obj = new JSONObject(s);
 		String id = obj.getString(MSG_ID);
-		if(id.equals(CONGESTION_ALARM)){
-			return 0;
-		} else if(id.equals(PATH_ACK)){
+		if(id.equals(PATH_ACK)){
 			return 1;
 		} else if(id.equals(REQUEST_PATH)){
 			return 2;

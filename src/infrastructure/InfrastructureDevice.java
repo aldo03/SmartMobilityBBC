@@ -57,13 +57,18 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 	private ICurrentTimes curTimes;
 	private double currentTemperature;
 	private double currentHumidity;
+	private boolean mock;
 	
-	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost) {
+	public InfrastructureDevice(String id, Set<IPair<String, Integer>> nearNodesWeighted, String brokerHost, boolean mock) {
 		this.id = id;
 		this.nearNodesWeighted = nearNodesWeighted;
 		this.brokerHost = brokerHost;
+		this.mock = mock;
 	}
 	
+	/**
+	 * Data structures are initialized
+	 */
 	private void initializeDataStructures(){
 		this.travelTimes = new TravelTimesByNumberOfVehicles(this.id);
 		this.expectedVehicles = new ExpectedNumberOfVehicles(this.id);
@@ -79,7 +84,12 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		this.currentTemperature = DEF_TEMP;
 		this.currentHumidity = DEF_HUM;
 		MongoDBUtils.initTempHum(this.id, this.currentTemperature, this.currentHumidity);
-		ITemperatureHumiditySensor sensor = new TemperatureHumiditySensorMock(22, 30);
+		ITemperatureHumiditySensor sensor = null;
+		if(this.mock){
+			sensor = new TemperatureHumiditySensorMock(22, 30);
+		} else{
+			sensor = new TemperatureHumiditySensor();
+		}
 		TemperatureHumidityThread sensorThread = new TemperatureHumidityThread(sensor);
 		sensorThread.attachObserver(this);
 		sensorThread.start();
@@ -142,6 +152,10 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		}
 	}
 
+	/**
+	 * a path ack msg is received
+	 * @param message the message received
+	 */
 	private void handlePathAckMsg(String message) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
 		IPathAckMsg msg = JSONMessagingUtils.getPathAckMsgFromString(message);
 		//At this point, sets the user among the ones that are going to move across a certain path
@@ -157,6 +171,10 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		}
 	}
 
+	/**
+	 * a request travel time msg is received
+	 * @param message the message received
+	 */
 	private void handleRequestTravelTimeMsg(String message)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
 		//System.out.println(message);
@@ -184,13 +202,21 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 		}
 	}
 
-	//sets the travel time acked as one of the current times of the specific path
+	/**
+	 * a travel time ack msg is received. The travel time acked is set as one of the current times of the specific path.
+	 * @param message the message received
+	 */
 	private void handleTravelTimeAckMsg(String message) throws JSONException {
 		ITravelTimeAckMsg msg = JSONMessagingUtils.getTravelTimeAckMsgFromString(message);
 		this.curTimes.addTime(msg.getSecondNode().getNodeID(), msg.getTravelTime());
 	}
 
-	//returns the travel time expected to a certain node at a certain time
+	/**
+	 * 
+	 * @param node the target node
+	 * @param time
+	 * @return the travel time expected from this node to a certain node at a certain time
+	 */
 	private int getTravelTime(IInfrastructureNode node, int time) {
 		int numOfVehiclesExpected = this.expectedVehicles.getVehicles(node.getNodeID(), time);
 		int travelTime = this.travelTimes.getTravelTime(node.getNodeID(), numOfVehiclesExpected);

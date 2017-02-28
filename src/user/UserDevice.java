@@ -58,6 +58,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 	private String respMsgTest;
 	private int startingDelay;
 
+	/**
+	 * this constructor is used to create a User which goal is to travel from start to end. The user
+	 * sends a Request Path msg to the server.
+	 * @param start
+	 * @param end
+	 */
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end){
 		this.travelID = 0;
 		this.userID = "newuser";
@@ -69,6 +75,15 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.startingDelay = 0;
 	}
 	
+	/**
+	 * this constructor is used to create a User which goal is to travel from start to end. The user
+	 * sends a Request Path msg to the server. The user moves through the path after a delay (startingDelay) and
+	 * with the given times (prefixedTimes)
+	 * @param start
+	 * @param end
+	 * @param prefixedTimes
+	 * @param startingDelay
+	 */
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, int startingDelay){
 		this.travelID = 0;
 		this.userID = "newuser";
@@ -81,6 +96,16 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.startingDelay = startingDelay;
 	}
 	
+	/**
+	 * this constructor is used to create a User that moves through a prefixed path. The user does not send a request path
+	 * msg to the server. The user moves through the path after a delay (startingDelay) and
+	 * with the given times (prefixedTimes)
+	 * @param start
+	 * @param end
+	 * @param prefixedTimes
+	 * @param msg
+	 * @param startingDelay
+	 */
 	public UserDevice(IInfrastructureNode start, IInfrastructureNode end, List<Integer> prefixedTimes, String msg, int startingDelay){
 		this.travelID = 0;
 		this.userID = "newuser";
@@ -94,6 +119,9 @@ public class UserDevice extends Thread implements IGPSObserver {
 		this.startingDelay = startingDelay;
 	}
 	
+	/**
+	 * The RabbitMQ channel is initialized
+	 */
 	private Channel initChannel() throws IOException, TimeoutException {
 		this.factory = new ConnectionFactory();
 		this.factory.setHost(brokerAddress);
@@ -112,13 +140,13 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 		this.travelTimes = new ArrayList<Pair<Integer, Integer>>();
 		this.currentIndex = 0;
-		if(this.testLearning){
+		if(this.testLearning){ //this is a learning test. The user moves through a prefixed path with prefixed times.
 			try {
 				this.handleResponsePathMsg(this.respMsgTest);
 			} catch (JSONException | IOException | TimeoutException e) {
 				e.printStackTrace();
 			}
-		} else{
+		} else{               //this is not a learning test. The user first requests the path to the server.
 			this.requestPaths(start, end);
 		}
 		
@@ -152,26 +180,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 
+	/**
+	 * the paths are requested to the server
+	 * @param start
+	 * @param end
+	 */
 	private void requestPaths(IInfrastructureNode start, IInfrastructureNode end) {
-		/*Vertx vertx = Vertx.vertx();
-		HttpClient client = vertx.createHttpClient();
-		client.websocket(8080, "localhost", "/some-uri", ws -> {
-			ws.handler(data -> {
-				System.out.println("Received data " + data.toString("ISO-8859-1"));
-				try {
-					this.handleResponsePathMsg(data.toString());
-				} catch (JSONException | IOException | TimeoutException e) {
-					e.printStackTrace();
-				}
-			});
-			IRequestPathMsg requestMsg = new RequestPathMsg(MessagingUtils.REQUEST_PATH, this.start, this.end);
-			try {
-				String requestPathString = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
-				ws.writeBinaryMessage(Buffer.buffer(requestPathString));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		});*/
 		IRequestPathMsg requestMsg = new RequestPathMsg(MessagingUtils.REQUEST_PATH, this.start, this.end, this.userID);
 		try {
 			String requestPathString = JSONMessagingUtils.getStringfromRequestPathMsg(requestMsg);
@@ -188,6 +202,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 
+	/**
+	 * when all the response travel time messages have been received, the best path is evaluated.
+	 * @return the best path among the ones received.
+	 */
 	private INodePath evaluateBestPath() {
 		int min = Integer.MAX_VALUE;
 		int minTravelID = -1;
@@ -212,9 +230,6 @@ public class UserDevice extends Thread implements IGPSObserver {
 		try {
 			int n = MessagingUtils.getIntId(msg);
 			switch (n) {
-			case 0:
-				handleCongestionAlarmMsg(msg);
-				break;
 			case 1:
 				handlePathAckMsg(msg);
 				break;
@@ -230,31 +245,30 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 
-	private void handleCongestionAlarmMsg(String msg) throws JSONException {
-		ICongestionAlarmMsg message = JSONMessagingUtils.getCongestionAlarmMsgFromString(msg);
-	}
-
+	/**
+	 * a path ack msg is received. This means that the coordinates are received from the server
+	 * @param msg the message received
+	 */
 	private void handlePathAckMsg(String msg) throws JSONException {
 		System.out.println("[User "+this.userID+" received: "+msg);
 		IPathAckMsg message = JSONMessagingUtils.getPathAckWithCoordinatesMsgFromString(msg);
 		this.chosenPath = message.getPath();
-		/*List<Integer> times = new ArrayList<>();
-		times.add(2);*/
 		INodePath path = new NodePath(new ArrayList<>(this.chosenPath.getPathNodes()));
-		GpsMock gps = new GpsMock(path, this.prefixedTimes);  //TODO: we have to find a way to create a mock path with mock times
+		GpsMock gps = new GpsMock(path, this.prefixedTimes); //the GPS signal is Mock
 		gps.attachObserver(this);
 		gps.start();
 	}
 
+	/**
+	 * a response path msg is received.
+	 * @param msg the message received
+	 */
 	private void handleResponsePathMsg(String msg)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
 		System.out.println("[User "+this.userID+" received: "+msg);
 		IResponsePathMsg message = JSONMessagingUtils.getResponsePathMsgFromString(msg);
 		List<INodePath> paths;
 		paths = message.getPaths();
-		/*for(INodePath path : paths){
-			path.printPath();
-		}*/
 		this.userID = message.getUserID();
 		this.brokerAddress = message.getBrokerAddress();
 		try {
@@ -271,12 +285,12 @@ public class UserDevice extends Thread implements IGPSObserver {
 			String toSend = JSONMessagingUtils.getStringfromRequestTravelTimeMsg(requestMsg);
 			MomUtils.sendMsg(factory, paths.get(i).getPathNodes().get(0).getNodeID(), toSend);
 		}
-		/*List<IInfrastructureNode> path = new ArrayList<>();
-		path.add(this.start);
-		path.add(this.end);
-		this.chosenPath.setPath(path);*/
 	}
-
+	
+	/**
+	 * a response travel time msg is received.
+	 * @param msg the message received
+	 */
 	private void handleResponseTravelTimeMsg(String msg) throws JSONException {
 		IResponseTravelTimeMsg message = JSONMessagingUtils.getResponseTravelTimeMsgFromString(msg);
 		this.travelID = message.getTravelID();
@@ -298,12 +312,19 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 	
+	/**
+	 * an ack is sent to the first node of the chosen path.
+	 */
 	private void sendAckToNode() throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
 		IPathAckMsg ackMsgToNode = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
 	    String ackToSend = JSONMessagingUtils.getStringfromPathAckMsg(ackMsgToNode);
 	    MomUtils.sendMsg(this.factory, this.chosenPath.getPathNodes().get(0).getNodeID(), ackToSend);
 	}
 	
+	/**
+	 * method invoked when the user is next to the next node of the chosen path
+	 * @param time
+	 */
 	private void nearNextNode(int time) throws JSONException, UnsupportedEncodingException, IOException, TimeoutException{
 		ITravelTimeAckMsg msg = new TravelTimeAckMsg(this.userID, MessagingUtils.TRAVEL_TIME_ACK,
 				chosenPath.getPathNodes().get(this.currentIndex), this.chosenPath.getPathNodes().get(this.currentIndex + 1), time);
@@ -326,27 +347,10 @@ public class UserDevice extends Thread implements IGPSObserver {
 		}
 	}
 	
+	/**
+	 * coordinates are requested to the server
+	 */
 	private void requestCoordinates(){
-		/*Vertx vertx = Vertx.vertx();
-		HttpClient client = vertx.createHttpClient();
-
-		client.websocket(8080, "localhost", "/some-uri", ws -> {
-			ws.handler(data -> {
-				System.out.println("> [User " + this.userID + "] Received data " + data.toString("ISO-8859-1"));
-				try {
-					this.handlePathAckMsg(data.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			});
-			IPathAckMsg pathAckMsg = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
-			try {
-				String pathAckString = JSONMessagingUtils.getStringfromPathAckMsg(pathAckMsg);
-				ws.writeBinaryMessage(Buffer.buffer(pathAckString));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		});*/
 		IPathAckMsg pathAckMsg = new PathAckMsg(this.userID, MessagingUtils.PATH_ACK, this.chosenPath, this.travelID);
 		try {
 			String pathAckString = JSONMessagingUtils.getStringfromPathAckMsg(pathAckMsg);

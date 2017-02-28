@@ -26,9 +26,10 @@ public class MongoDBUtils {
 	private static final String DB_EXPECTED_VEHICLES = "expectedvehiclesdb";
 	private static final String DB_CURRENT_TIMES = "currenttimesdb";
 	private static final String DB_TEMPHUM = "temphum";
+	private static final String DB_ADDR = "192.168.43.240";
 	
 	public static void initDb(){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		db.drop();
 		/*db = mongoClient.getDatabase(DB_TIME_TRAVELS);
@@ -41,7 +42,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initCurrentTime(String nodeId){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		db.getCollection(nodeId).dropIndexes();
 		db.getCollection(nodeId).drop();
@@ -49,7 +50,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initTimes(String nodeId){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		db.getCollection(nodeId).dropIndexes();
 		db.getCollection(nodeId).drop();
@@ -57,7 +58,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initExpectedVehicles(String nodeId) {
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		db.getCollection(nodeId).dropIndexes();
 		db.getCollection(nodeId).drop();
@@ -65,7 +66,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initTempHum(String nodeId, double temp, double hum){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		collection.dropIndexes();
@@ -77,7 +78,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initTravelTimes(String nodeId, String nodeId2, List<Integer> list){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		Document doc = new Document("_id", nodeId2)
@@ -87,7 +88,7 @@ public class MongoDBUtils {
 	}
 
 	public static void setTravelTime(String nodeId, String nodeId2, int index, int travelTime){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument().append("_id", new BsonString(nodeId2));
@@ -97,7 +98,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void setTemp(String nodeId, double temp){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument();
@@ -107,7 +108,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void setHum(String nodeId, double hum){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument();
@@ -117,7 +118,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initCurrentTime(String nodeId, String nodeId2){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		Document doc = new Document("_id", nodeId2)
@@ -127,7 +128,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void addCurrentTime(String nodeId, String nodeId2, int time){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument().append("_id", new BsonString(nodeId2));
@@ -137,7 +138,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void clearCurrentTimes(String nodeId, Set<String> ids){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		for(String s : ids){
@@ -149,7 +150,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void initExpectedVehicles(String nodeId, String nodeId2){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		Document doc = new Document("_id", nodeId2)
@@ -159,7 +160,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void addExpectedVehicle(String nodeId, String nodeId2, int time){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument().append("_id", new BsonString(nodeId2));
@@ -169,7 +170,7 @@ public class MongoDBUtils {
 	}
 	
 	public static void removeExpectedVehicles(String nodeId, String nodeId2, int freshTime){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		BsonDocument updateQuery  = new BsonDocument().append("_id", new BsonString(nodeId2));
@@ -180,7 +181,7 @@ public class MongoDBUtils {
 	
 	public static Map<String, List<Integer>> getCurrentTimes(String nodeId){
 		Map<String, List<Integer>> curTimes = new HashMap<>();
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_CURRENT_TIMES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		FindIterable<Document> iterable = collection.find();
@@ -198,7 +199,7 @@ public class MongoDBUtils {
 	
 	public static Map<String, List<Integer>> getExpectedVehicles(String nodeId){
 		Map<String, List<Integer>> curTimes = new HashMap<>();
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_EXPECTED_VEHICLES);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		FindIterable<Document> iterable = collection.find();
@@ -216,7 +217,7 @@ public class MongoDBUtils {
 	
 	public static Map<String, List<Integer>> getTimeTravels(String nodeId){
 		Map<String, List<Integer>> curTimes = new HashMap<>();
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TIME_TRAVELS);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		FindIterable<Document> iterable = collection.find();
@@ -233,7 +234,7 @@ public class MongoDBUtils {
 	}
 	
 	public static IPair<Double, Double> getTempHum(String nodeId){
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( DB_ADDR );
 		MongoDatabase db = mongoClient.getDatabase(DB_TEMPHUM);
 		MongoCollection<Document> collection = db.getCollection(nodeId);
 		FindIterable<Document> iterable = collection.find();

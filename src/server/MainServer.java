@@ -57,86 +57,10 @@ public class MainServer {
 		this.nodesSet = new HashSet<>();
 		this.nodeMapId = new HashMap<>();
 		this.userSeed = 10000;
-		this.initVertx();
+		this.initHTTP();
 	}
 
-	private void initVertx() throws Exception{
-		/*Vertx vertx = Vertx.vertx();
-		Router router = Router.router(vertx);
-
-		router.route("/").handler(routingContext -> {
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "text/html").end("<h1>Entry point.</h1>");
-		});
-
-		router.get("/api/resources").handler(routingContext -> {
-			HttpServerRequest req = routingContext.request();
-			HttpServerResponse response = routingContext.response();
-			System.out.println(req.method().toString());
-			response.end("Reading res list");
-		});
-
-		router.postWithRegex("\\/api\\/resources\\/id([0-9])+").handler(routingContext -> {
-			HttpServerRequest req = routingContext.request();
-			HttpServerResponse response = routingContext.response();
-			response.end("creating res." + req.path());
-		});
-
-		router.putWithRegex("\\/api\\/resources\\/id([0-9])+").handler(routingContext -> {
-			HttpServerRequest req = routingContext.request();
-			HttpServerResponse response = routingContext.response();
-			response.end("changing res." + req.path());
-		});
-
-		router.route("/assets/*").handler(StaticHandler.create("assets"));
-
-		// Create the HTTP server and pass the "accept" method to the request
-		// handler.
-		vertx.createHttpServer();
-		vertx.createHttpServer().websocketHandler(ws -> {
-			System.out.println("WebSocket opened!");
-			ws.handler(hnd -> {
-				System.out.println("data received: " + hnd.toString());
-				try {
-					int n;
-					n = MessagingUtils.getIntId(hnd.toString());
-					switch (n) {
-					case 1:
-						Thread t1 = new Thread() {
-							@Override
-							public void run() {
-								try {
-									handlePathAckMsg(ws, hnd.toString());
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}
-							}
-
-						};
-						t1.start();
-						break;
-					case 2:
-						Thread t2 = new Thread() {
-							@Override
-							public void run() {
-								try {
-									handleRequestPathMsg(ws, hnd.toString());
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}
-							}
-
-						};
-						t2.start();
-						break;
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			});
-			// if (req.uri().equals("/"))
-			// req.response().sendFile(path+"/ws.html");
-		}).requestHandler(router::accept).listen(8080);*/
+	private void initHTTP() throws Exception{
 		HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", new HttpHandler(){
         	 @Override
@@ -173,7 +97,6 @@ public class MainServer {
  								} catch (JSONException e) {
  									e.printStackTrace();
  								} catch (IOException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
  							}
@@ -191,13 +114,15 @@ public class MainServer {
         server.start();
 	}
 
+	/**
+	 * a Request Path msg is received
+	 * @param t
+	 * @param msg the message received
+	 */
 	private void handleRequestPathMsg(HttpExchange t, String msg) throws JSONException, IOException{
 		IRequestPathMsg requestPathMsg = JSONMessagingUtils.getRequestPathMsgFromString(msg);
 		List<INodePath> pathList = this.getShortestPaths(this.findNearNode(requestPathMsg.getStartingNode()),this.findNearNode(
 				requestPathMsg.getEndingNode()));
-		/*for(INodePath node : pathList){
-			node.printPath();
-		}*/
 		String brokerAddress = this.getBrokerAddress(requestPathMsg.getStartingNode(), requestPathMsg.getEndingNode());
 		IResponsePathMsg responsePathMsg = new ResponsePathMsg(MessagingUtils.RESPONSE_PATH, this.generateUserID(requestPathMsg.getUserID()),
 				pathList, brokerAddress);
@@ -209,6 +134,10 @@ public class MainServer {
 		
 	}
 
+	/**
+	 * a Path Ack msg is received
+	 * @param msg the message received
+	 */
 	private void handlePathAckMsg(HttpExchange t, String msg) throws JSONException, IOException {
 		IPathAckMsg pathAckMsg = JSONMessagingUtils.getPathAckMsgFromString(msg);
 		List<IInfrastructureNode> pathWithCoordinates = new ArrayList<>();
@@ -229,6 +158,12 @@ public class MainServer {
 		os.close();
 	}
 
+	/**
+	 * gets the MOM broker address for a certain path
+	 * @param startingNode the first node of the path
+	 * @param endingNode the last node of the path
+	 * @return the MOM broker address for the given path
+	 */
 	private String getBrokerAddress(IInfrastructureNode startingNode, IInfrastructureNode endingNode) {
 		return "192.168.43.240";
 	}
@@ -256,6 +191,11 @@ public class MainServer {
 		return this.getNodePathFromPath(paths);
 	}
 
+	/**
+	 * gets Node Paths from Paths
+	 * @param paths
+	 * @return a list of INodePath
+	 */
 	private List<INodePath> getNodePathFromPath(List<Path> paths){
 		List<INodePath> pathList = new ArrayList<>();
 		for(Path path: paths){
@@ -267,7 +207,6 @@ public class MainServer {
 				nodeList.add(this.nodeMapId.get(id));
 			}
 			nodePath.setPath(nodeList);
-			//System.out.println("PATH TRANSFORM");
 			pathList.add(nodePath);
 		}
 		return pathList;
@@ -316,11 +255,6 @@ public class MainServer {
 		BaseVertex v = new Vertex();
 		v.set_id(node.getIntNodeID());
 		this.graph.add_vertex(v);
-		/*for (String nearNode : node.getNearNodesWeighted().keySet()) {
-			Integer idNear = this.getIntNodeID(nearNode);
-			this.graph.add_edge(node.getIntNodeID(), idNear, node.getNearNodesWeighted().get(nearNode));
-
-		}*/
 	}
 	
 	private Integer getIntNodeID(String s) {		
@@ -341,6 +275,11 @@ public class MainServer {
 		}
 	}
 	
+	/**
+	 * method invoked in order to find the nearest node from the point selected by the user
+	 * @param node the node selected from the user
+	 * @return the nearest node of nodesSet
+	 */
 	private IInfrastructureNode findNearNode(IInfrastructureNode node){
 		double distance = Double.MAX_VALUE;
 		IInfrastructureNode near = node;
