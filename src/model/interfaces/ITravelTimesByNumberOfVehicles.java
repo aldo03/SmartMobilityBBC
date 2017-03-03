@@ -1,6 +1,5 @@
 package model.interfaces;
 
-import java.util.List;
 
 /**
  * interface that defines a data structure that contains the expected travel times from a node to its

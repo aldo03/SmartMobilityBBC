@@ -2,7 +2,6 @@ package model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import model.interfaces.ICoordinates;
 import model.interfaces.IInfrastructureNodeImpl;

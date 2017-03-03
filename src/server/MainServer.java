@@ -24,7 +24,6 @@ import edu.asu.emit.qyan.alg.model.Path;
 import edu.asu.emit.qyan.alg.model.Vertex;
 import edu.asu.emit.qyan.alg.model.abstracts.BaseVertex;
 import model.NodePath;
-import model.interfaces.ICoordinates;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;

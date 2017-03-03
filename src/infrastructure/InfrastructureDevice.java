@@ -177,7 +177,6 @@ public class InfrastructureDevice extends Thread implements ITemperatureHumidity
 	 */
 	private void handleRequestTravelTimeMsg(String message)
 			throws JSONException, UnsupportedEncodingException, IOException, TimeoutException {
-		//System.out.println(message);
 		IRequestTravelTimeMsg msg = JSONMessagingUtils.getRequestTravelTimeMsgFromString(message);
 		INodePath path = msg.getPath();
 		path.removeFirstNode();					 //The path is forwarded without the current node

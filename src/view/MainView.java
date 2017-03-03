@@ -3,7 +3,6 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -25,7 +23,6 @@ import org.json.JSONException;
 
 import model.NodePath;
 import model.interfaces.IInfrastructureNode;
-import model.interfaces.IInfrastructureNodeImpl;
 import model.interfaces.INodePath;
 import model.interfaces.msg.IResponsePathMsg;
 import model.msg.ResponsePathMsg;
@@ -65,7 +62,6 @@ public class MainView extends JFrame implements WindowListener, ActionListener {
 		this.addWindowListener(this);
 		this.add(this.panel,BorderLayout.NORTH);
 		this.add(this.simulationPanel, BorderLayout.CENTER);
-		this.setVisible(true);
 	}
 	
 	private void initPanel(){

@@ -3,7 +3,6 @@ package user;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -11,19 +10,12 @@ import org.json.JSONException;
 
 import com.rabbitmq.client.*;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClient;
-import model.Coordinates;
-import model.InfrastructureNode;
-import model.InfrastructureNodeImpl;
 import model.NodePath;
 import model.Pair;
 import model.interfaces.ICoordinates;
 import model.interfaces.IGPSObserver;
 import model.interfaces.IInfrastructureNode;
 import model.interfaces.INodePath;
-import model.interfaces.msg.ICongestionAlarmMsg;
 import model.interfaces.msg.IPathAckMsg;
 import model.interfaces.msg.IRequestPathMsg;
 import model.interfaces.msg.IRequestTravelTimeMsg;

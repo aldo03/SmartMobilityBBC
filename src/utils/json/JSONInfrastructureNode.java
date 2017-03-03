@@ -3,7 +3,6 @@ package utils.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import model.Coordinates;
 import model.InfrastructureNode;
 import model.interfaces.IInfrastructureNode;
 

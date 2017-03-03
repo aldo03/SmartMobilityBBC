@@ -75,14 +75,7 @@ public class NodeView extends JFrame implements WindowListener, ActionListener {
 	private void initTables(){
 		//Create the "cards".
 		this.card1 = new JPanel() {
-            /**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
-
-			//Make the panel wider than it really needs, so
-            //the window's wide enough for the tabs to stay
-            //in one row.
             public Dimension getPreferredSize() {
                 Dimension size = super.getPreferredSize();
                 size.width += extraWindowWidth;

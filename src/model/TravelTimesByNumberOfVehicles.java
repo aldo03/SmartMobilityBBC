@@ -1,8 +1,6 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import model.interfaces.ITravelTimesByNumberOfVehicles;
@@ -17,7 +15,6 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 	private String nodeId;
 	
 	private Map<String, Integer[]> travelTimes;
-	private int samplingCounter;
 	
 	public TravelTimesByNumberOfVehicles(String nodeId){
 		this.travelTimes = new HashMap<>();
@@ -43,13 +40,6 @@ public class TravelTimesByNumberOfVehicles implements ITravelTimesByNumberOfVehi
 
 	@Override
 	public void initTravelTimes(String nodeId, int defaultValue) {
-		
-		/*Integer[] times = new Integer[ARRAY_LENGTH];
-		List<Integer> list = new ArrayList<>();
-		for(int i=0; i<times.length;i++){
-			times[i] = defaultValue;
-			list.add(defaultValue);
-		}*/
 		Integer[] times = new Integer[ARRAY_LENGTH];
 		MongoDBUtils.getTimeTravels(this.nodeId).get(nodeId).toArray(times);
 		this.travelTimes.put(nodeId, times);
